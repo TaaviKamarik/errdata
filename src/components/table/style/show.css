@@ -1,0 +1,36 @@
+.shows-cell {
+    cursor: pointer;
+}
+
+.show {
+    cursor: pointer;
+}
+
+.show-sort-btn {
+    font-weight: bold;
+    background-color: aliceblue;
+    padding: 0.5em;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.show-sort-btn:hover {
+    background-color: lightsteelblue;
+}
+
+.show-sort-btn-container {
+    display: flex;
+    flex-direction: column;
+    gap:0.5em;
+    padding: 0.5em;
+}
+
+.show-percentage-value {
+    font-size: 0.8em;
+    color: gray;
+    padding-left: 0.2em;
+}
+
+.show-number-color {
+    color: darkblue;
+}

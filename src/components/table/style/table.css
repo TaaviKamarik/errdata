@@ -1,0 +1,64 @@
+.data-table {
+    min-width: 100%;
+    max-width: 100%;
+    padding: 1.5rem;
+}
+
+th, td {
+    padding-right: 2em;
+    min-width: 160px;
+    text-align: left;
+}
+
+tr:nth-child(2n) {
+    background-color: whitesmoke;
+}
+
+th {
+    background-color: white;
+    position: sticky;
+    top: 0;
+}
+
+td {
+    padding-left: 0.5em;
+    overflow: hidden;
+}
+
+.data-table-header {
+    text-align: start;
+    border-bottom: solid 2px gray;
+}
+
+.data-table-header:nth-child(1),
+.data-table-header:nth-child(2),
+.data-table-header:nth-child(4),
+.data-table-header:nth-child(5) {
+    cursor: pointer;
+}
+
+.same-sentence-click {
+    cursor: pointer;
+    color: darkblue;
+}
+
+table {
+    margin: 0;
+    padding: 0;
+}
+
+.table-pagination {
+    display: flex;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.data-table-header[data-order="ASC"]::after {
+    content: "▲";
+    padding-left: 0.5em;
+}
+
+.data-table-header[data-order="DESC"]::after {
+    content: "▼";
+    padding-left: 0.5em;
+}

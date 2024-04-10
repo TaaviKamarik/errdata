@@ -1,0 +1,20 @@
+.sentence-container {
+    width: 500px;
+    max-height: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.loading-container {
+    overflow: hidden;
+}
+
+.loaded-container {
+    max-height: 600px;
+}
+
+.sentence-inner{
+    background-color: whitesmoke;
+    border-radius: 3px;
+}

@@ -1,0 +1,8 @@
+.round-icon {
+    height: 10px;
+    width: 10px;
+    border: solid 5px #27187eaa;
+    background: none;
+    border-radius: 50%;
+    transform: translate(-25%, -25%);
+}
