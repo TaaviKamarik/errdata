@@ -5,18 +5,17 @@ import SentenceSkeleton from "./SentenceSkeleton";
 import ShowBox from "./ShowBox";
 import getShowData from "../queries/getShowData";
 
-export default function Show({data, olemData, textCodes}) {
-  const shows = data.tekstikood?.split(",");
+export default function Show({data, olemData, textCodes, queryButtonPressed}) {
   const cellRef = React.useRef();
   const [showMetadata, setShowMetadata] = useState()
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
 
-  console.log(showMetadata)
+
   return (
     <div className="shows-cell" ref={cellRef}>
-      <div onClick={(e) => getShowData(e, setAnchorEl, shows, setShowMetadata)}>
+      <div onClick={(e) => setAnchorEl(e.currentTarget)}>
         <span>
           <strong className="show-number-color">
             {data.koodNr}
@@ -40,18 +39,16 @@ export default function Show({data, olemData, textCodes}) {
           horizontal: 'center',
         }}
       >
-        {!showMetadata
-          ?
-          <div className="sentence-container loading-container">
-            <SentenceSkeleton/>
-          </div>
-          :
+        <div style={{minHeight: "600px", padding: "0.5rem"}}>
+          <div style={{fontSize: "1.5rem", fontWeight: "bold", marginBottom: "1rem"}}>Saadete nimekiri</div>
           <ShowBox
-            showMetaData={showMetadata}
             olemData={olemData}
             data={data}
+            queryButtonPressed={queryButtonPressed}
+            version={"table"}
           />
-        }
+        </div>
+
       </Popover>
     </div>
   );

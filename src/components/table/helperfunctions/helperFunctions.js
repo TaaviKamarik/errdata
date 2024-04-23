@@ -1,4 +1,5 @@
 export const transformedObject = (dataArray) => {
+  console.log(dataArray)
   return dataArray.reduce((acc, {teksti_kood, omadus, vaartus}) => {
     // Handle teksti_kood separately to ensure it's included only once
     if (!acc['teksti_kood']) {

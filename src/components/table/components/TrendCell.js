@@ -67,7 +67,7 @@ const TrendWindow = ({textCode, years, chartData}) => {
         height={300}
         axisHighlight={{x: 'line', y: 'none'}}
         series={[{ data: chartData, label: 'saateid', area: true, showMark: false, color: "#007FFF" }]}
-        xAxis={[{data: years, label: 'aasta', tickMinStep: 1}]}
+        xAxis={[{data: years, label: 'aasta', tickMinStep: 1, valueFormatter: (v) => `${v}`}]}
         yAxis={[{tickMinStep: 1, label: 'saateid'}]}
         sx={{
           '.MuiLineElement-root': {
@@ -96,20 +96,32 @@ TERE
   )
 }
 
-const TrendCell = ({data, dateValue}) => {
-  const shows = data.split(",");
-  const [years, setYears] = useState([])
+const fillYearArray = (filterValues) => {
+  let tempArray = [];
+  for(let i = filterValues.dateMin; i <= filterValues.dateMax; i++){
+    tempArray.push(parseInt(i))
+  }
+  return tempArray;
+}
+
+const TrendCell = ({data, filterValues}) => {
+  const [years, setYears] = useState(fillYearArray(filterValues))
   const [chartData, setChartData] = useState([])
   const [anchorEl, setAnchorEl] = React.useState(null);
 
-  const fillYearArray = () => {
-    let tempArray = [];
-    for(let i = dateValue[0]; i <= dateValue[1]; i++){
-      tempArray.push(i)
-    }
-    return tempArray;
-  }
+  useEffect(() => {
+    const valuesArray = []
+    const showArray = new Array(years.length).fill(0);
+    data.years.forEach((show, index) => {
+      valuesArray.push({code: data.tekstikood[index], year: parseInt(show)})
+    })
 
+    years.forEach((year, index) => {
+      showArray[index] = valuesArray.filter((value) => value.year === year).length
+    })
+
+    setChartData(showArray);
+  }, [data])
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -120,8 +132,7 @@ const TrendCell = ({data, dateValue}) => {
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
   useEffect(() => {
-    const tempYears = fillYearArray();
-    axios.post(urlValue + "getnimetrend", {
+    /*axios.post(urlValue + "getnimetrend", {
       tekst: shows,
     }).then((response) => {
       let tempArray = [];
@@ -137,8 +148,8 @@ const TrendCell = ({data, dateValue}) => {
       })
       setYears(tempYears);
       setChartData(tempArray);
-    })
-  }, [data, dateValue])
+    })*/
+  }, [])
 
   return (
     <div>
@@ -160,7 +171,7 @@ const TrendCell = ({data, dateValue}) => {
                   color: "#007FFF"
                 },
               ]}
-              xAxis={[{ scaleType: 'point', data: years }]}
+              xAxis={[{ scaleType: 'point', data: years}]}
               yAxis={[{tickMinStep: 1}]}
             >
               <AreaPlot />
@@ -182,7 +193,7 @@ const TrendCell = ({data, dateValue}) => {
           horizontal: 'center',
         }}
       >
-        <TrendWindow textCode={shows} years={years} chartData={chartData}/>
+        <TrendWindow textCode={data.tekstikood} years={years} chartData={chartData}/>
       </Popover>
     </div>
   );

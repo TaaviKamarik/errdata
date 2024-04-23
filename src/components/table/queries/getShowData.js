@@ -2,16 +2,9 @@ import axios from "axios";
 import {urlValue} from "../../../constants/constants";
 import {transformedObject} from "../helperfunctions/helperFunctions";
 
-export default function getShowData(event, setAnchorEl, shows, setShowMetadata) {
-  if(event.latlng) {
-    console.log(event.target)
-    setAnchorEl(event.target._icon.children[0])
-  } else {
-    setAnchorEl(event.currentTarget)
-  }
+export default function getShowData(olemData, data, setShowData) {
   const promises = []
-  shows.forEach((show) => {
-    console.log(show)
+  data.forEach((show) => {
     promises.push(axios.get(urlValue + "getshowdata", {
       params: {
         tekst: show,
@@ -21,6 +14,6 @@ export default function getShowData(event, setAnchorEl, shows, setShowMetadata) 
     }))})
 
   Promise.all(promises).then((response) => {
-    setShowMetadata(response);
+    setShowData(response);
   })
 }

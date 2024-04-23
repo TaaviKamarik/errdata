@@ -6,8 +6,9 @@ import {TabContext, TabList, TabPanel} from "@mui/lab";
 import TextField from "@mui/material/TextField";
 import {startingWiewButton} from "./constants/constants";
 import fetchRequest from "../../queries/fetchRequest";
+import {MultiDirectedGraph} from "graphology";
 
-const StartingView = ({setInputArray, setQueryButtonPressed, setTextCodes}) => {
+const StartingView = ({setInputArray, setQueryButtonPressed, setGraph}) => {
   const [modeValue, setModeValue] = useState('names');
   const [selectedName, setSelectedName] = useState([]);
   const [selectedKeyword, setSelectedKeyword] = useState([]);
@@ -20,6 +21,7 @@ const StartingView = ({setInputArray, setQueryButtonPressed, setTextCodes}) => {
   const callNameQuery = async() => {
     setInputArray(selectedName);
     setQueryButtonPressed("name");
+    setGraph(new MultiDirectedGraph())
   }
 
   const callKeywordQuery = async() => {
@@ -35,7 +37,7 @@ const StartingView = ({setInputArray, setQueryButtonPressed, setTextCodes}) => {
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <TabList onChange={handleModeChange} aria-label="lab API tabs example">
               <Tab sx={{width: "50%"}} label="Nimepäring" value="names" />
-              <Tab sx={{width: "50%"}} label="Märksõnapäring" value="keywords" />
+              <Tab sx={{width: "50%"}} label="Märksõnapäring" value="keywords" disabled />
             </TabList>
           </Box>
           <TabPanel value="names">

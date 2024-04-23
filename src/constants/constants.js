@@ -24,8 +24,10 @@ export const tableLoadCircularProgress = {
 export const addFilterButton = {
   borderRadius: "10px",
   padding: "0.5em",
-  minWidth: "30px",
-  minHeight: "30px"
+  minWidth: "40px",
+  minHeight: "40px",
+  maxWidth: "40px",
+  maxHeight: "40px",
 }
 
 export const sliderStyle = {

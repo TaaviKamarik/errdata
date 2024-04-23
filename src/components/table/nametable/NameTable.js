@@ -4,15 +4,16 @@ import axios, {CanceledError} from "axios";
 import {CircularProgress, Pagination, Stack, Tooltip} from "@mui/material";
 import {loadingSmall} from "../../../constants/constants";
 import SentencePopover from "../components/SentencePopover";
-import TablePagination from "../components/TablePagination";
+import TablePagination from "../components/NameTablePagination";
 import Show from "../components/Show";
 import LaunchIcon from '@mui/icons-material/Launch';
 import TrendCell from "../components/TrendCell";
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import HelpIcon from '@mui/icons-material/Help';
+import NameTablePagination from "../components/NameTablePagination";
 
-const NameTable = ({inputArray, textCodes, dateValue, tabVal, queryAnswer}) => {
+const NameTable = ({inputArray, textCodes, filterValues, setFilterValues, tabVal, queryAnswer, selectedCode, queryButtonPressed}) => {
   const [sameSentenceValues, setSameSentenceValues] = useState([])
   const [renderData, setRenderData] = useState([])
   const [textCodeArray, setTextCodeArray] = useState([])
@@ -21,8 +22,8 @@ const NameTable = ({inputArray, textCodes, dateValue, tabVal, queryAnswer}) => {
   const [tableRows, setTableRows] = useState(20);
   const [sortBy, setSortBy] = useState("kokku");
   const [sortOrder, setSortOrder] = useState("DESC");
+  const [localQuery, setLocalQuery] = useState(queryAnswer);
   const controller = new AbortController();
-
   const tyybid = {loc: "Asukoht", org: "Organisatsioon", per: "Isik"}
 
   const handlePageChange = (event, value) => {
@@ -31,9 +32,11 @@ const NameTable = ({inputArray, textCodes, dateValue, tabVal, queryAnswer}) => {
   }
 
   const handleHeaderClick = (e) => {
+    const ID = e.target.id;
     controller.abort();
     setSortBy(e.target.id);
     let attribute = e.target.getAttribute("data-order");
+
     if(attribute === ""){
       attribute = "DESC";
     }else if (attribute === "DESC"){
@@ -41,7 +44,17 @@ const NameTable = ({inputArray, textCodes, dateValue, tabVal, queryAnswer}) => {
     } else {
       attribute = "DESC";
     }
-    setSortOrder(attribute)
+
+    const sortedQueryAnswer = [...queryAnswer]
+
+    if(attribute === "ASC"){
+      sortedQueryAnswer.sort((a,b) => (a[ID] > b[ID]) ? 1 : ((b[ID] > a[ID]) ? -1 : 0))
+    } else {
+      sortedQueryAnswer.sort((a,b) => (a[ID] < b[ID]) ? 1 : ((b[ID] < a[ID]) ? -1 : 0))
+    }
+
+    setLocalQuery(sortedQueryAnswer);
+
     document.querySelectorAll(".data-table-header").forEach((val) => {val.setAttribute("data-order", "")});
     e.target.setAttribute("data-order", attribute);
   }
@@ -53,7 +66,7 @@ const NameTable = ({inputArray, textCodes, dateValue, tabVal, queryAnswer}) => {
           <tr>
             <th
               className={"data-table-header"}
-              id={"lyhilemma"}
+              id={tabVal === "nameTab" ? "nimetus" :"lyhilemma"}
               data-order=""
               onClick={(e) => {handleHeaderClick(e)}}
             >
@@ -67,11 +80,12 @@ const NameTable = ({inputArray, textCodes, dateValue, tabVal, queryAnswer}) => {
             >
               Koosmainimisi kokku<Tooltip title={"Mitu korda valitud olem ja märksõna tekstides koos esinesid."} placement={"top"}><HelpIcon sx={{fontSize: "0.8em", lineHeight: "0.8em"}}/></Tooltip>
             </th>
-            {tabVal === "nameTab" && <th
+            {tabVal === "nameTab" && inputArray.length === 1 && <th
               className={"data-table-header"}
-              id={"tekstikood"}
+              id={"ykslause"}
+              onClick={(e) => {handleHeaderClick(e)}}
             >
-              Samas lauses<Tooltip title={"Mitu korda valitud olem ja märksõna tekstides koos esinesid."} placement={"top"}><HelpIcon sx={{fontSize: "0.8em", lineHeight: "0.8em"}}/></Tooltip>
+              Seosed lauses<Tooltip title={"Mitu korda valitud olem ja märksõna tekstides koos esinesid."} placement={"top"}><HelpIcon sx={{fontSize: "0.8em", lineHeight: "0.8em"}}/></Tooltip>
             </th>}
             {queryAnswer[0].smskoor && <th
               className={"data-table-header"}
@@ -81,14 +95,17 @@ const NameTable = ({inputArray, textCodes, dateValue, tabVal, queryAnswer}) => {
             >
               Sõna üldine SM skoor<Tooltip title={"Märksõna SM skoor. SM (Sõnade Mitmekesisuse) skoor mõõdab sõna kasutuse mitmekesisust erinevates kontekstides või tekstides, näidates, kui muutlikult sõna kasutatakse."} placement={"top"}><HelpIcon sx={{fontSize: "0.8em", lineHeight: "0.8em"}}/></Tooltip>
             </th>}
-            <th
+            {tabVal === "nameTab" && <th
               className={"data-table-header"}
               id={"tyyp"}
               data-order=""
-              onClick={(e) => {handleHeaderClick(e)}}
+              onClick={(e) => {
+                handleHeaderClick(e)
+              }}
             >
-              Nime kategooria<Tooltip title={"Mis kategooriasse nimi jaotatud on."} placement={"top"}><HelpIcon sx={{fontSize: "0.8em", lineHeight: "0.8em"}}/></Tooltip>
-            </th>
+              Nime kategooria<Tooltip title={"Mis kategooriasse nimi jaotatud on."} placement={"top"}><HelpIcon
+              sx={{fontSize: "0.8em", lineHeight: "0.8em"}}/></Tooltip>
+            </th>}
             <th
               className={"data-table-header"}
               id={"koodNr"}
@@ -105,43 +122,44 @@ const NameTable = ({inputArray, textCodes, dateValue, tabVal, queryAnswer}) => {
           </tr>
         </thead>
         <tbody>
-          {queryAnswer[0] && queryAnswer.map((data, index) => {
-            return(
-              <tr key={"row" + index}>
-                <td>{data.lyhilemma || data.nimetus}</td>
-                <td>{data.kokku}</td>
-                {tabVal === "nameTab" &&<td>
-                  <SentencePopover
+          {queryAnswer[0] && localQuery.map((data, index) => {
+            if(index >= (page - 1) * 20 && index < page * 20){
+              return(
+                <tr key={"row" + index}>
+                  <td>{data.lyhilemma || data.nimetus}</td>
+                  <td>{data.kokku}</td>
+                  {tabVal === "nameTab" && inputArray.length === 1 &&<td>
+                    <SentencePopover
                     key={data.lyhilemma || data.nimetus}
-                    rowVal={data.lyhilemma || data.nimetus}
-                    inputArray={inputArray}
-                    controller={controller}
-                    />
-                </td>}
-                {data.smskoor && <td>{parseFloat(data.smskoor).toFixed(3)}</td>}
-                <td>{tyybid[data.tyyp]}</td>
-                <td>
-                  <Show
-                    olemData={inputArray[0]}
                     data={data}
-                    textCodes={textCodes}
-                  />
-                </td>
-                <td><TrendCell data={data.tekstikood} dateValue={dateValue}/></td>
-              </tr>
-            )
+                    inputArray={inputArray}
+                    tyyp={data.tyyp}
+                    selectedCode={selectedCode}
+                    />
+                  </td>}
+                  {data.smskoor && <td>{parseFloat(data.smskoor).toFixed(3)}</td>}
+                  {tabVal === "nameTab" && <td>{tyybid[data.tyyp]}</td>}
+                  <td>
+                    <Show
+                      olemData={inputArray[0]}
+                      data={data}
+                      textCodes={textCodes}
+                      queryButtonPressed={queryButtonPressed}
+                    />
+                  </td>
+                  <td><TrendCell data={data} filterValues={filterValues}/></td>
+                </tr>
+              )
+            }
           })}
         </tbody>
       </table>
-      {/*Add pagination to table*/}
-      {/*<TablePagination
+      <NameTablePagination
         handlePageChange={handlePageChange}
-        page={page}
         tableRows={tableRows}
-        olemKoodid={olemKoodid}
-        teemaVastus={teemaVastus}
-        url={url}
-        dateValue={dateValue}/>*/}
+        filterValues={filterValues}
+        queryValue={queryAnswer}
+      />
     </div>
   );
 };

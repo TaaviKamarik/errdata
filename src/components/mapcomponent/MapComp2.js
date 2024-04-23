@@ -26,8 +26,9 @@ import getShowData from "../table/queries/getShowData";
 import {addFilterButton, tabValues} from "../../constants/constants";
 import AutoCompleteWithScroll from "../autocompletewithscroll/AutoCompleteWithScroll";
 import {handleEnterPress} from "../nameTab/helperfunctions/helperFunctions";
+import {handleChipDelete} from "../helperfunctions/helperFunctions";
 
-export default function MapComp2({mapData, inputArray, tabVal, setInputArray}) {
+export default function MapComp2({mapData, inputArray, tabVal, setInputArray, setGraph, queryButtonPressed}) {
   const [inputText, setInputText] = useState("")
   const [keyList, setkeyList] = useState([])
   const [textObjList, setObjTextList] = useState([])
@@ -48,14 +49,11 @@ export default function MapComp2({mapData, inputArray, tabVal, setInputArray}) {
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
   const [showMetadata, setShowMetadata] = useState()
+  const [changedMap, setChangedMap] = useState()
   const locationTexts = {};
 
   const [locationData, setLocationData] = useState();
   const [addFilterIsOpen, setAddFilterIsOpen] = useState(false);
-
-  const colors = ["red-background", "blue-background", "yellow-background", "orange-background", "green-background", "dark-blue-background", "purple-background", "pink-background"]
-  const chipColors= ["#ffadad", "#9bf6ff", "#fdffb6", "#ffd6a5", "#caffbf", "#a0c4ff", "#bdb2ff", "#ffc6ff"]
-  const coordinates= [{"koht":"Aabla","laiuskraad":"34.1510867","pikkuskraad":"36.2740782","kogus":1.0},{"koht":"Aakre","laiuskraad":"58.1015159","pikkuskraad":"26.197324","kogus":1.0},{"koht":"Aardlapalu","laiuskraad":"58.3277779","pikkuskraad":"26.7655999","kogus":1.0},{"koht":"Aaspere","laiuskraad":"59.4313995","pikkuskraad":"26.1338481","kogus":1.0},{"koht":"Aavere","laiuskraad":"59.0701127","pikkuskraad":"26.0641192","kogus":1.0},{"koht":"Adavere","laiuskraad":"58.7086403","pikkuskraad":"25.8976836","kogus":1.0},{"koht":"Adila","laiuskraad":"11.3344149","pikkuskraad":"27.0000778","kogus":1.0},{"koht":"Adiste","laiuskraad":"58.1053357","pikkuskraad":"27.1412277","kogus":1.0},{"koht":"Adra","laiuskraad":"36.748834","pikkuskraad":"-3.0203617","kogus":1.0},{"koht":"Adraku","laiuskraad":"58.9225098","pikkuskraad":"26.8442503","kogus":1.0},{"koht":"Ahja","laiuskraad":"58.2087709","pikkuskraad":"27.0820855","kogus":1.0},{"koht":"Ahtme","laiuskraad":"59.3289416","pikkuskraad":"27.4220282","kogus":1.0}]
 
   const customIcon = new divIcon({
     html:
@@ -63,134 +61,6 @@ export default function MapComp2({mapData, inputArray, tabVal, setInputArray}) {
         </div>`,
     className: "cluster-others"
   })
-
-  function MyComponent() {
-    const map = useMapEvents({
-      dragend: (e) => {
-        setSelectedIndex(-1)
-        const coordList = []
-        coordinates.forEach(coord => {
-          if (coord.laiuskraad > e.target.getBounds()["_southWest"]["lat"] && coord.pikkuskraad > e.target.getBounds()["_southWest"]["lng"] && coord.laiuskraad < e.target.getBounds()["_northEast"]["lat"] && coord.pikkuskraad < e.target.getBounds()["_northEast"]["lng"]){
-            coordList.push(coord);
-          }
-        })
-
-        const newTextList = []
-        coordList.forEach(coord => {
-          if (locationTexts[coord.koht.toLowerCase()]) {
-            locationTexts[coord.koht.toLowerCase()].split(",").map(val => {
-              newTextList.push(val.replace(".txt", ""))
-            })
-          }
-        })
-
-        setRenderItems(textList.filter(txt => newTextList.includes(txt)));
-      },
-      zoomend: (e) => {
-        setSelectedIndex(-1)
-        const coordList = []
-        coordinates.forEach(coord => {
-          if (coord.laiuskraad > e.target.getBounds()["_southWest"]["lat"] && coord.pikkuskraad > e.target.getBounds()["_southWest"]["lng"] && coord.laiuskraad < e.target.getBounds()["_northEast"]["lat"] && coord.pikkuskraad < e.target.getBounds()["_northEast"]["lng"]){
-            coordList.push(coord);
-          }
-        })
-
-        const newTextList = []
-        coordList.forEach(coord => {
-          if (locationTexts[coord.koht.toLowerCase()]) {
-            locationTexts[coord.koht.toLowerCase()].split(",").map(val => {
-              newTextList.push(val.replace(".txt", ""))
-            })
-          }
-        })
-
-        setRenderItems(textList.filter(txt => newTextList.includes(txt)));
-      }
-    });
-    return null;
-  }
-
-  useEffect(() => {
-    const getData = (value) => {
-      return new Promise((resolve, reject) => {
-        fetch("https://minitorn.tlu.ee/~jaagup/oma/too/22/12/tekstid/"+value).then(resp => resp.text()).then(data => resolve(data))
-      })
-    }
-
-    const loadData = () => {
-      const textArrayTemp = []
-      const metaArrayTemp = []
-      renderItems.forEach((value) => {
-        metaArrayTemp.push(metaData[value.split('.')[0].substring(1)])
-        textArrayTemp.push(getData(value))
-      })
-
-      setListOfMetadata(metaArrayTemp)
-
-      Promise.all(textArrayTemp).then((allData) => {
-        setListOfMetaText(allData)
-      })
-    }
-
-    if(renderItems){
-      loadData()
-    }
-  }, [renderItems])
-
-  const renderMeta = (txt, index) => {
-    const metaKey = txt.replace("t", "");
-    const metaValue = metaData[metaKey];
-    if(metaValue) {
-      return(
-        <div className="entry-container" >
-          <div className="entry-bubbles-container" style={{gap: "5px"}}></div>
-          <div className="entry-body-container">
-            <div style={{fontWeight: "bold"}}>{metaValue["saatenimi"]}</div>
-            <div>{metaValue["salvestuskoht"]}</div>
-            <div style={{fontSize: "0.7rem", color: "darkgray"}}>{metaValue["salvestusaeg"] ? metaValue["salvestusaeg"] : metaValue["eetrikuupaev"]}</div>
-          </div>
-        </div>
-      )
-    }
-  }
-
-  const changeSideWidth = (initial, toggleVal) => {
-    {sidePanelWidth === initial ? setSidePanelWidth(toggleVal) : setSidePanelWidth(initial)}
-  }
-
-  const txtInnerJoinFunction = () => {
-    if(textObjList.length > 1){
-      let tempList = textObjList[0][keyList[0]]
-      textObjList.forEach((val, index) => {
-        if(index < textObjList.length - 1){
-          tempList = tempList.filter(item => textObjList[index + 1][keyList[index + 1]].includes(item))
-        }
-      })
-      setTextList(tempList)
-      setRenderItems(tempList)
-    }
-  }
-
-  const closeBtnPress = () => {
-    setTextWindow(false)
-    setSidePanelWidth(500)
-  }
-
-  const handleSwitchChange = () => {
-    if(textObjList.length > 1){
-      if(!textInnerJoin){
-        txtInnerJoinFunction();
-        setTextInnerJoin(true)
-      }else if(textInnerJoin) {
-        const tempList = []
-        textObjList.forEach((val, index) => {
-          val[keyList[index]].forEach(item => tempList.push(item))
-        })
-        setTextList(tempList)
-        setRenderItems(tempList)
-        setTextInnerJoin(false)
-      }}
-  }
 
   const createClusterCustomIcon = (cluster) => {
     const count = cluster.getChildCount();
@@ -219,9 +89,15 @@ export default function MapComp2({mapData, inputArray, tabVal, setInputArray}) {
     <div className="table-upper-container">
       <div className="main-word-container">{tabValues.titleSelection[tabVal]}</div>
       {inputArray.map((filter, index) => {
-        return(
-          <div className="added-filter">{filter}</div>
-        )
+        if(inputArray.length > 1) {
+          return(
+            <Chip label={filter} color="primary" style={{borderRadius: "10px", minHeight: "40px", fontSize: "1rem"}} onDelete={(e) => handleChipDelete(e, setInputArray, setGraph)} />
+          )
+        } else {
+          return(
+            <Chip label={filter} color="primary" style={{borderRadius: "10px", minHeight: "40px", fontSize: "1rem"}}/>
+          )
+        }
       })}
       {addFilterIsOpen && tabVal === "nameTab" &&
         <AutoCompleteWithScroll
@@ -269,21 +145,18 @@ export default function MapComp2({mapData, inputArray, tabVal, setInputArray}) {
                     icon={customIcon}
                     eventHandlers={{
                       click: (event) => {
-                        getShowData(event, setAnchorEl, coordinate.tekstikood.split(","), setShowMetadata);
-                        setLocationData(coordinate);
                         event.target.openPopup();
                       },
                     }}
                   >
                     <Popup offset={[0, 200]} maxWidth="auto" maxHeight="500" className="map-popup">
                       <div style={{fontSize: "1.5rem", fontWeight: "bold", marginBottom: "1rem"}}>Saadete nimekiri</div>
-                        {showMetadata &&
-                          <ShowBox
-                            showMetaData={showMetadata}
-                            olemData={inputArray[0]}
-                            data={locationData}
-                          />
-                        }
+                      <ShowBox
+                        data={coordinate}
+                        olemData={inputArray[0]}
+                        queryButtonPressed={queryButtonPressed}
+                        version={"map"}
+                      />
                     </Popup>
                     <LeafletTooltip direction="top" offset={[0, 0]} opacity={1}>
                       <div style={{width: "200px", display: "flex", flexDirection: "column", gap: "0.3em"}}>
@@ -296,10 +169,8 @@ export default function MapComp2({mapData, inputArray, tabVal, setInputArray}) {
                 )
               )}
             </MarkerClusterGroup>
-            <MyComponent/>
           </MapContainer>
         </div>
-
         : <CircularProgress style={{marginTop: "200px", marginLeft: "calc(50% - 50px)"}} size="100px" variant="indeterminate" />}
 
     </div>
