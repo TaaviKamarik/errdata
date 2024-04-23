@@ -9,6 +9,7 @@ export default function AutoCompleteWithScroll (props) {
   const [inputValue, setInputValue] = useState('');
   const [prevInputValue, setPrevInputValue] = useState();
   const [peopleOptions, setPeopleOptions] = useState([]);
+  const [codes, setCodes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
   const [offset, setOffset] = useState(0);

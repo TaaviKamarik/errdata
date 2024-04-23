@@ -1,11 +1,11 @@
-export const tableDataProps = (textCodes, dateQueryValue) => {
+export const tableDataProps = (textCodes, filterValues) => {
   return {
     tekst: textCodes,
-    limit: 20,
-    page: 1,
-    sortBy: "kokku",
-    sortOrder: "DESC",
-    dateMin: dateQueryValue[0],
-    dateMax: dateQueryValue[1]
+    limit: 1000000,
+    page: filterValues.page,
+    sortBy: filterValues.sortBy,
+    sortOrder: filterValues.sortOrder,
+    dateMin: filterValues.dateMin,
+    dateMax: filterValues.dateMax
   }
 }

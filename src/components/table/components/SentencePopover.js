@@ -5,29 +5,18 @@ import '../style/sentencePopover.css'
 import {urlValue} from "../../../constants/constants";
 import SentenceSkeleton from "./SentenceSkeleton";
 import SentenceBox from "./SentenceBox";
+import GraphShowList from "../../namegraph/GraphShowList";
+import {buildGraph} from "../../namegraph/helperfunctions/buildGraph";
 
-const SentencePopover = ({inputArray, controller, rowVal}) => {
-
+const SentencePopover = ({inputArray, rowVal, tyyp, data, selectedCode}) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [sentenceData, setSentenceData] = useState();
   const [renderData, setRenderData] = useState([]);
-
-  useEffect(() => {
-      axios.get(urlValue + "samesentence", {
-        params: {
-          olem: inputArray[0],
-          teema: rowVal,
-        },
-        signal: controller.signal
-      }).then(response => {
-        console.log(response.data)
-        setRenderData(response.data);
-      }).catch((e) => {
-        if (e instanceof CanceledError) {
-          console.log("Request was cancelled")
-        }
-      })
-  }, [])
+  const getOlemKood = async() => {
+    const connections =  await axios.get(urlValue + `samesentence?nimi=${selectedCode}&kood=${data.olemi_kood}`)
+    const connectionsData = connections.data;
+    setRenderData(connectionsData);
+  }
 
   const handleClose = () => {
     setAnchorEl(null);
@@ -37,22 +26,8 @@ const SentencePopover = ({inputArray, controller, rowVal}) => {
   const id = open ? 'simple-popover' : undefined;
 
   const handleGetSentences = (event) => {
+    getOlemKood();
     setAnchorEl(event.currentTarget)
-    const promises = [];
-    renderData.forEach((entry) => {
-      console.log(entry)
-      const inputs = entry.lause_kood.split("_");
-      promises.push(axios.get(urlValue + "getsamesentences", {
-        params: {
-          code: inputs[0],
-          sentence: inputs[1]
-        }
-      }))
-    })
-
-    Promise.all(promises).then((res) => {
-      setSentenceData(res); // Use the callback to ensure the latest state
-    })
   }
 
   const renderValues = () => {
@@ -62,12 +37,7 @@ const SentencePopover = ({inputArray, controller, rowVal}) => {
 
   return (
     <div>
-      {renderData.length === 0
-        ?
-        <CircularProgress size={10} color="primary" />
-        :
-        <div className={"same-sentence-click"} onClick={(e) => handleGetSentences(e)}><strong>{renderValues()}</strong></div>
-      }
+      <div className={"same-sentence-click"} onClick={(e) => handleGetSentences(e)}><strong>{data.ykslause === 0 ? "-" : data.ykslause}</strong></div>
       <Popover
         id={id}
         open={open}
@@ -82,7 +52,7 @@ const SentencePopover = ({inputArray, controller, rowVal}) => {
           horizontal: 'center',
         }}
       >
-        {!sentenceData ? <SentenceSkeleton/> : <SentenceBox sentenceData={sentenceData}/>}
+        {!renderData ? <SentenceSkeleton/> : <GraphShowList showData={renderData}/>}
       </Popover>
     </div>
   );

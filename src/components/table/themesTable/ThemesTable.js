@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {
-  Button,
+  Button, Chip, CircularProgress,
   IconButton,
   Table,
   TableBody,
@@ -18,29 +18,47 @@ import {addFilterButton, tabValues, urlValue} from "../../../constants/constants
 import AutoCompleteWithScroll from "../../autocompletewithscroll/AutoCompleteWithScroll";
 import {handleEnterPress} from "../../nameTab/helperfunctions/helperFunctions";
 import AddIcon from "@mui/icons-material/Add";
+import {handleChipDelete} from "../../helperfunctions/helperFunctions";
 
-const ThemesTable = ({tabVal, textCodes, inputArray, dateValue, themes, setInputArray}) => {
+const ThemesTable = ({tabVal, textCodes, setFilterValues, inputArray, filterValues, themes, setInputArray, setGraph}) => {
   const [valueClicked, setValueClicked] = useState(false)
   const [selectedValue, setSelectedValue] = useState("")
-  const [marksonaNimeData, setMarskonaNimeData] = useState(false)
+  const [marksonaNimeData, setMarksonaNimeData] = useState(false)
   const [addFilterIsOpen, setAddFilterIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const getLemmaData = (e) => {
+  const getLemmaData = (e, textCodeArray) => {
+    setValueClicked(true);
+    setMarksonaNimeData(null);
     axios.post(urlValue + "getmarksonadnimedest", {
-      tekst: textCodes,
+      tekst: textCodeArray,
       teema: [e.target.innerText],
-      limit: 20,
-      page: 1,
-      sortBy: "kokku",
-      sortOrder: "DESC",
-      dateMin: dateValue[0],
-      dateMax: dateValue[1]
+      limit: 100000000,
+      page: filterValues.page,
+      sortBy: filterValues.sortBy,
+      sortOrder: filterValues.sortOrder,
+      dateMin: filterValues.dateMin,
+      dateMax: filterValues.dateMax
     }).then((response) => {
-      setMarskonaNimeData(response.data)
-      setValueClicked(true);
+      const responseAnswer = response.data;
+      responseAnswer.forEach((val, index) => {
+        const shows = val.tekstikood.split(",");
+        const textcodes = [];
+        const years = [];
+        shows.forEach((show) => {
+          const splitValue = show.split(":");
+          textcodes.push(splitValue[0]);
+          years.push(splitValue[1]);
+        })
+        responseAnswer[index].tekstikood = textcodes;
+        responseAnswer[index].years = years;
+      })
+      setMarksonaNimeData(responseAnswer)
       setSelectedValue(e.target.innerText)
     })
   }
+
+  console.log(marksonaNimeData)
 
   const handleChosenCategoryBack = () => {
     setValueClicked(false);
@@ -53,9 +71,15 @@ const ThemesTable = ({tabVal, textCodes, inputArray, dateValue, themes, setInput
       <div className="table-upper-container">
         <div className="main-word-container">{tabValues.titleSelection[tabVal]}</div>
         {inputArray.map((filter, index) => {
-          return(
-            <div className="added-filter">{filter}</div>
-          )
+          if(inputArray.length > 1) {
+            return(
+              <Chip label={filter} color="primary" style={{borderRadius: "10px", minHeight: "40px", fontSize: "1rem"}} onDelete={(e) => handleChipDelete(e, setInputArray, setGraph)} />
+            )
+          } else {
+            return(
+              <Chip label={filter} color="primary" style={{borderRadius: "10px", minHeight: "40px", fontSize: "1rem"}}/>
+            )
+          }
         })}
         {addFilterIsOpen && tabVal === "nameTab" &&
           <AutoCompleteWithScroll
@@ -64,7 +88,7 @@ const ThemesTable = ({tabVal, textCodes, inputArray, dateValue, themes, setInput
             setNimeData={setInputArray}
             setAddFilterIsOpen={setAddFilterIsOpen}
           />}
-        {addFilterIsOpen&& tabVal === "keywordTab" &&
+        {addFilterIsOpen && tabVal === "keywordTab" &&
           <TextField onKeyDown={(e) => {handleEnterPress(e, setInputArray, inputArray, setAddFilterIsOpen)}}></TextField>}
         <Tooltip title={"Lisa nimede filtreid"}>
           <Button
@@ -77,7 +101,8 @@ const ThemesTable = ({tabVal, textCodes, inputArray, dateValue, themes, setInput
           </Button>
         </Tooltip>
       </div>
-      {!valueClicked && <TableContainer>
+      {!themes && <div style={{width: "600px", height: "600px", display:"flex", alignItems: "center", justifyContent: "center"}}><CircularProgress/></div>}
+      {!valueClicked && themes &&  <TableContainer>
         <Table sx={{maxWidth: 800}} aria-label="simple table">
           <TableHead>
             <TableRow>
@@ -91,7 +116,7 @@ const ThemesTable = ({tabVal, textCodes, inputArray, dateValue, themes, setInput
               <TableRow
                 key={row.marksona}
               >
-                <TableCell className="themes-tab-theme-click" onClick={(e) => getLemmaData(e)} scope="row">
+                <TableCell className="themes-tab-theme-click" onClick={(e) => getLemmaData(e, row.tekstikood)} scope="row">
                   {row.marksona}
                 </TableCell>
                 <TableCell>{row.kokku}</TableCell>
@@ -100,7 +125,8 @@ const ThemesTable = ({tabVal, textCodes, inputArray, dateValue, themes, setInput
             ))}
           </TableBody>
         </Table>
-      </TableContainer>}
+      </TableContainer>
+      }
       {valueClicked && marksonaNimeData &&
         <div>
           <div style={{display: "flex", paddingLeft: "2rem", alignItems: "center", gap: "1rem"}}>
@@ -113,10 +139,12 @@ const ThemesTable = ({tabVal, textCodes, inputArray, dateValue, themes, setInput
             inputArray={inputArray}
             textCodes={textCodes}
             queryAnswer={marksonaNimeData}
-            tabVal={tabVal}
-            dateValue={dateValue}/>
-        </div>
-      }
+            tabVal={"themesTab"}
+            filterValues={filterValues}
+            setFilterValues={setFilterValues}
+          />
+        </div>}
+      {valueClicked && !marksonaNimeData && <div style={{width: "600px", height: "600px", display:"flex", alignItems: "center", justifyContent: "center"}}><CircularProgress/></div>}
     </div>
   );
 };

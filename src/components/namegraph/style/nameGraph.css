@@ -1,0 +1,32 @@
+.graph-shows {
+    width: 600px;
+    max-height: 600px;
+    padding: 0.5rem;
+}
+
+.graph-shows hr {
+    border-top: solid 1px lightgray;
+}
+
+.graph-shows hr:last-child {
+    display: none;
+}
+
+.graph-show-single {
+    border-radius: 0.5rem;
+    background-color: #a0c4ff20;
+    margin: 0.5rem;
+}
+
+.graph-show-title {
+    padding: 0.5rem 0.5rem 0.2rem;
+    border-radius: 0.5rem 0.5rem 0 0;
+    display: flex;
+    background-color: #a0c4ff30;
+}
+
+.graph-show-lause {
+    padding: 0.2rem 0.5rem 0.5rem;
+    display: flex;
+
+}
