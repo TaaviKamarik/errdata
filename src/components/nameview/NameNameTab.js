@@ -1,17 +1,10 @@
-import React, {useEffect, useState} from 'react';
-import AutoCompleteWithScroll from "../autocompletewithscroll/AutoCompleteWithScroll";
-import {Button, Chip, CircularProgress, TextField, Tooltip} from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import NameTable from "../table/nametable/NameTable";
-import fetchRequest from "../../queries/fetchRequest";
-import {addFilterButton, tableLoadCircularProgress, tabValues} from "../../constants/constants";
-import {handleEnterPress} from "./helperfunctions/helperFunctions";
-import {tableDataProps} from "./constants/constants";
-import {handleChipDelete} from "../helperfunctions/helperFunctions";
+import React, {useState} from 'react';
+import { CircularProgress} from "@mui/material";
+import {tableLoadCircularProgress, tabValues} from "../../constants/constants";
 import {Alert} from "@mui/lab";
-import YearSlider from "../yearslider/YearSlider";
+import NameNameTable from "./NameNameTable";
 
-export default function NameTab (
+export default function NameNameTab (
   {
     filterValues,
     queryAnswer,
@@ -29,7 +22,7 @@ export default function NameTab (
       </div>
       {!queryAnswer.length === 0 && <Alert severity="warning">Nime kohta ei leitud infot. Muuda filtrites aastaarve ja proovi uuesti!</Alert>}
       {queryAnswer &&
-        <NameTable
+        <NameNameTable
           filterValues={filterValues}
           tabVal={tabVal}
           queryAnswer={queryAnswer}

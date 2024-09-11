@@ -1,25 +1,11 @@
 import './App.css';
-import {Box, Button, CircularProgress, Tab, TextField, Tooltip} from "@mui/material";
-import React, {Suspense, useEffect, useState} from "react";
-import NameTable from "./components/table/nametable/NameTable";
+import React, {useEffect, useState} from "react";
 import axios from "axios";
 import StartingView from "./components/startingwiew/StartingView";
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import AddIcon from '@mui/icons-material/Add';
-import {TabContext, TabList, TabPanel} from "@mui/lab";
-import AutoCompleteWithScroll from "./components/autocompletewithscroll/AutoCompleteWithScroll";
-import ThemesTable from "./components/table/themesTable/ThemesTable";
-import YearSlider from "./components/yearslider/YearSlider";
-import NameTab from "./components/nameTab/NameTab";
-import KeywordTab from "./components/keywordTab/KeywordTab";
 import fetchRequest from "./queries/fetchRequest";
 import {tabValues, urlValue} from "./constants/constants";
 import {tableDataProps} from "./components/nameTab/constants/constants";
-import MapComponent from "./components/mapcomponent/MapComponent";
-import MapComp2 from "./components/mapcomponent/MapComp2";
-import {NetworkGraph} from "./components/networkgraph/NetworkGraph";
-import {NameGraph} from "./components/namegraph/NameGraph";
-import {MultiDirectedGraph} from "graphology";
+import NameViews from "./components/nameview/NameViews";
 
 function App() {
   const url = "https://dti.tlu.ee/errlinked/api/src/"
@@ -29,6 +15,7 @@ function App() {
     sortBy: "kokku",
     sortOrder: "DESC",
     page: 1,
+    limit: 20,
   })
 
   const [marksonaData, setMarksonaData] = useState();
@@ -45,26 +32,20 @@ function App() {
   const [textCodes, setTextCodes] = useState([]);
 
   const [keywordArray, setKeywordArray] = useState([]);
+
   const [nameArray, setNameArray] = useState([]);
+  const [nameQueryAnswer, setNameQueryAnswer] = useState();
+
+
   const [inputArray, setInputArray] = useState();
 
   const [queryAnswer, setQueryAnswer] = useState();
   const [mapAnswer, setMapAnswer] = useState();
 
-  const [nimeList, setNimeList] = useState([]);
+  const [keywordList, setKeywordList] = useState([]);
   const [marksonaList, setMarksonaList] = useState([]);
 
   const [queryProps, setQueryProps] = useState();
-
-  useEffect (() => {
-    if(!marksonaData) return;
-    setMarksonaList([marksonaData]);
-    callMarksonaQuery();
-  }, [keywordArray]);
-
-  useEffect(() => {
-    if (nameTextCodes.length === 0) return;
-  }, [nameTextCodes]);
 
   useEffect(() => {
     if (!inputArray) return;
@@ -74,13 +55,10 @@ function App() {
       dataProps.mainOlem = selectedCode;
     }
 
-    const otherProps = {tekst: textCodes, dateMin: filterValues.dateMin, dateMax: filterValues.dateMax}
-
     const callFetch = async () => {
       if(textCodes.length === 0) return;
       setMapAnswer(null);
       const queryRes = await fetchRequest(dataProps, tabValues.urlProp[queryButtonPressed]);
-      console.log(queryRes);
       queryRes.forEach((val, index) => {
         const shows = val.tekstikood.split(",");
         const textcodes = [];
@@ -98,9 +76,9 @@ function App() {
       const promiseArray = [];
       const filteredQuery = queryRes.filter((val) => val.tyyp === 'loc');
 
-      filteredQuery.forEach((val) => {
+     /* filteredQuery.forEach((val) => {
         promiseArray.push(axios.get(urlValue + `getmapcoordinates?code=${val.olemi_kood}`))
-      });
+      });*/
 
       Promise.all(promiseArray).then((res) => {
         res.forEach((val, index) => {
@@ -121,28 +99,17 @@ function App() {
   useEffect(() => {
     if (!inputArray) return;
     setQueryAnswer(null)
-    if(queryButtonPressed === "name") {
-      callNameQuery();
-    }
     if(queryButtonPressed === "keyword") {
       callKeywordQuery();
     }
   },[inputArray, filterValues])
 
-  const callNameQuery = async() => {
-    const nameCode = await axios.get(urlValue + `getolemkood?name=${inputArray[0]}`);
-    const names = await fetchRequest({tekst: inputArray}, "gettextcodesbyname");
-    if(names !== "No rows") {
-      setTextCodes(names);
-      setSelectedCode(nameCode.data[0].kood)
-    }
-  }
 
   const callKeywordQuery = async() => {
-    const keywords = await fetchRequest({marksonad: inputArray}, "gettextcodesbykeyword");
+    const keywords = await fetchRequest({marksonad: inputArray[0]}, "gettextcodesbykeyword");
+    console.log(keywords);
     setTextCodes(keywords);
   }
-
 
   const fetchThemes = (val) => {
     axios.post(url + "getthemes",{
@@ -189,67 +156,33 @@ function App() {
     axios.post(url + "gettextcodesbymarksona", {
       marksonad: keywordArray,
     }, {headers: 'application/json; charset=utf-8'}).then((response) => {
+      console.log(response.data);
       setNameTextCodes(response.data);
       fetchThemes(response.data);
     });
   }
 
-  const addToMarksonaArray = (val) => {
-    const stringArray = val.trim().split(" ");
-    const tempArray = [...keywordArray];
-    stringArray.forEach((val) => {
-      tempArray.push(val);
-    });
-    setKeywordArray(tempArray);
-  }
-
-  console.log(queryAnswer)
-
   return (
     <div className="App">
       {!queryButtonPressed &&
         <StartingView
-          setInputArray={setInputArray}
+          setNameArray={setNameArray}
+          setKeywordArray={setKeywordArray}
           setQueryButtonPressed={setQueryButtonPressed}
           setGraph={setGraph}
+          setNameQueryAnswer={setNameQueryAnswer}
+          setMapAnswer={setMapAnswer}
         />}
-      {queryButtonPressed &&  <div>
-        <div>
-          <TabContext value={currentTabValue}>
-            <div className="table-upper-container">
-              <Button onClick={() => handleBackButtonPress()} variant="contained" sx={{borderRadius: "10px", padding: "0.5em", minWidth: "30px", minHeight: "30px"}}><ArrowBackIosNewIcon fontSize={"medium"}/></Button>
-              <Box>
-                <TabList onChange={handleTabChange}>
-                  <Tab label="Nimede seosed" value="nameTab" />
-                  <Tab label="Märksõnade seosed" value="keywordTab" />
-                  <Tab label="Kaardivaade" value="mapTab" />
-                  {queryButtonPressed === "name" && <Tab label="Graafivaade" value="GraphTab"/>}
-                </TabList>
-              </Box>
-            </div>
-            <div><YearSlider filterValues={filterValues} setFilterValues={setFilterValues}/></div>
-            <TabPanel value="nameTab">
-              {inputArray && queryButtonPressed === "name" && <NameTab queryButtonPressed={queryButtonPressed} selectedCode={selectedCode} setFilterValues={setFilterValues} setGraph={setGraph} inputArray={inputArray} textCodes={textCodes} setInputArray={setInputArray} filterValues={filterValues} tabVal={"nameTab"} queryAnswer={queryAnswer}/>}
-              {inputArray && queryButtonPressed === "keyword" && <NameTab queryButtonPressed={queryButtonPressed} selectedCode={selectedCode} setFilterValues={setFilterValues} setGraph={setGraph} inputArray={inputArray} textCodes={textCodes} setInputArray={setInputArray} filterValues={filterValues} tabVal={"keywordTab"} queryAnswer={queryAnswer}/>}
-            </TabPanel>
-            <TabPanel value="keywordTab">
-              {inputArray && queryButtonPressed === "name" && <ThemesTable queryButtonPressed={queryButtonPressed} setFilterValues={setFilterValues} setGraph={setGraph} tabVal={"nameTab"} themes={themes} textCodes={textCodes} inputArray={inputArray} setInputArray={setInputArray} filterValues={filterValues} queryAnswer={queryAnswer}/>}
-              {inputArray && queryButtonPressed === "keyword" && <ThemesTable queryButtonPressed={queryButtonPressed} setFilterValues={setFilterValues} setGraph={setGraph} tabVal={"keywordTab"} themes={themes} textCodes={textCodes} inputArray={inputArray} setInputArray={setInputArray} filterValues={filterValues} queryAnswer={queryAnswer}/>}
-            </TabPanel>
-            <TabPanel value="mapTab">
-              {inputArray && queryButtonPressed === "name" && <MapComp2 queryButtonPressed={queryButtonPressed} setGraph={setGraph} mapData={mapAnswer} inputArray={inputArray} tabVal={"nameTab"} setInputArray={setInputArray} />}
-              {inputArray && queryButtonPressed === "keyword" && <MapComp2 queryButtonPressed={queryButtonPressed} setGraph={setGraph} mapData={mapAnswer} inputArray={inputArray} tabVal={"nameTab"} setInputArray={setInputArray} />}
-            </TabPanel>
-
-            {queryButtonPressed === "name" && currentTabValue === "GraphTab" && <NameGraph graph={graph} setGraph={setGraph} setInputArray={setInputArray} inputArray={inputArray}/>}
-
-          </TabContext>
-        </div>
-        {/*<Suspense fallback={""}>
-          <NameTable allCodes={nameThemes.length} url={url} teemaData={teemaData}
-                 olemKoodid={nameThemes} olemData={nimeData} dateValue={dateQueryValue}/>
-        </Suspense>*/}
-      </div>}
+      {queryButtonPressed &&
+        <NameViews
+          setQueryButtonPressed={setQueryButtonPressed}
+          queryButtonPressed={queryButtonPressed}
+          setGraph={setGraph}
+          nameQueryAnswer={nameQueryAnswer}
+          graph={graph}
+          nameArray={nameArray}
+          mapAnswer={mapAnswer}
+        />}
     </div>
   );
 }

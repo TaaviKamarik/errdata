@@ -1,11 +1,12 @@
-import React, {useEffect, useState} from 'react';
+import React, { useState } from 'react';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import getAllPeopleForDropDown from "../../queries/getAllPeopleForDropDown";
 import {handleScroll} from "./helperfunctions/helperFunctions";
 import useFetchOnPeopleInputChange from "./hooks/useFetchOnPeopleInputChange";
+import getAllKeywordsForDropDown from "../../queries/getAllKeywordsForDropDown";
 
-export default function AutoCompleteWithScroll (props) {
+export default function AutoCompleteWithScrollKeywords ({isMainPage, setSelectedKeywords, selectedKeywords}) {
   const [inputValue, setInputValue] = useState('');
   const [prevInputValue, setPrevInputValue] = useState();
   const [peopleOptions, setPeopleOptions] = useState([]);
@@ -15,23 +16,21 @@ export default function AutoCompleteWithScroll (props) {
   const [hasMore, setHasMore] = useState(true);
   const amount = 20;
 
-  const fetchOlem = (word, currentPage, innerPage, innerPeopleOptions) => {
+  const fetchOlem = (word, currentPage) => {
     if (loading || !hasMore) return;
     setLoading(true);
-    if (innerPeopleOptions.length > 0 && innerPage === 0) return
-    getAllPeopleForDropDown(innerPage, word, amount, currentPage, setHasMore, setPeopleOptions, setOffset, setPage, setLoading);
+    getAllKeywordsForDropDown(page, word, amount, currentPage, setHasMore, setPeopleOptions, setOffset, setPage, setLoading);
   }
 
   // Fetch initial data
-  useFetchOnPeopleInputChange(inputValue, offset, fetchOlem, prevInputValue, setPrevInputValue, peopleOptions, page)
+  useFetchOnPeopleInputChange(inputValue, offset, fetchOlem, prevInputValue, setPrevInputValue)
 
   const callHandleScroll = (event) => {
-    handleScroll(event, fetchOlem, inputValue, offset, page, peopleOptions);
+    handleScroll(event, fetchOlem, inputValue, offset);
   }
 
   const handleSelect = (event, value) => {
-    props.setNimeData(value)
-    !props.isMainPage && props.setAddFilterIsOpen(false);
+    isMainPage ? setSelectedKeywords([value]) : setSelectedKeywords([...selectedKeywords, value])
   }
 
   return (
@@ -39,11 +38,10 @@ export default function AutoCompleteWithScroll (props) {
       sx={{width: "auto !important"}}
       noOptionsText=""
       size="small"
-      defaultValue={props.nimeData[0]}
       fullWidth
       multiple
       options={peopleOptions}
-      getOptionLabel={(option) => option.nimetus}
+      defaultValue={selectedKeywords[0]}
       onInputChange={(event, newInputValue) => {
         setInputValue(newInputValue);
         setPeopleOptions([]); // Clear options on input change
@@ -55,8 +53,8 @@ export default function AutoCompleteWithScroll (props) {
           fullWidth
           variant={"outlined"}
           {...params}
-          label={props.label}
-          style={!props.isMainPage ? {width: "100%"} : {}}
+          label={""}
+          style={isMainPage ? {width: "100%"} : {}}
            />}
       onChange={
         (event, value) => handleSelect(event, value)

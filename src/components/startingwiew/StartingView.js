@@ -7,26 +7,31 @@ import TextField from "@mui/material/TextField";
 import {startingWiewButton} from "./constants/constants";
 import fetchRequest from "../../queries/fetchRequest";
 import {MultiDirectedGraph} from "graphology";
+import AutoCompleteWithScrollKeywords from "../autocompletewithscroll/AutoCompleteWithScrollKeywords";
+import {tabValues, urlValue} from "../../constants/constants";
+import axios from "axios";
+import NameInput from "../nameview/NameInput";
 
-const StartingView = ({setInputArray, setQueryButtonPressed, setGraph}) => {
+const StartingView = ({setNameArray, setKeywordArray, setQueryButtonPressed, setGraph, setNameQueryAnswer, setMapAnswer}) => {
   const [modeValue, setModeValue] = useState('names');
-  const [selectedName, setSelectedName] = useState([]);
-  const [selectedKeyword, setSelectedKeyword] = useState([]);
+
+
+  const [selectedKeywords, setSelectedKeywords] = useState([]);
+
+  const [filterValues, setFilterValues] = useState({
+    dateMin: 2000,
+    dateMax: 2023,
+    sortBy: "kokku",
+    sortOrder: "DESC",
+    page: 1,
+  })
 
   const handleModeChange = (event, newValue) => {
     setModeValue(newValue)
   }
 
-  console.log(selectedName)
-  const callNameQuery = async() => {
-    setInputArray(selectedName);
-    setQueryButtonPressed("name");
-    setGraph(new MultiDirectedGraph())
-  }
-
   const callKeywordQuery = async() => {
-    console.log(selectedKeyword)
-    setInputArray(selectedKeyword)
+    setKeywordArray(selectedKeywords)
     setQueryButtonPressed("keyword");
   }
 
@@ -37,38 +42,28 @@ const StartingView = ({setInputArray, setQueryButtonPressed, setGraph}) => {
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <TabList onChange={handleModeChange} aria-label="lab API tabs example">
               <Tab sx={{width: "50%"}} label="Nimepäring" value="names" />
-              <Tab sx={{width: "50%"}} label="Märksõnapäring" value="keywords" disabled />
+              <Tab sx={{width: "50%"}} label="Märksõnapäring" value="keywords" />
             </TabList>
           </Box>
           <TabPanel value="names">
-            <div>
-              <div className="starting-view-text">Nimi: </div>
-              <AutoCompleteWithScroll
-                isMainPage={true}
-                setNimeData={setSelectedName}
-                nimeData={selectedName}
-              />
-              <Button
-                disabled={!selectedName[0]}
-                sx={startingWiewButton}
-                onClick={callNameQuery}
-                variant={"contained"}
-              >
-                Saada päring
-              </Button>
-            </div>
+            <NameInput
+              setNameArray={setNameArray}
+              setNameQueryAnswer={setNameQueryAnswer}
+              setQueryButtonPressed={setQueryButtonPressed}
+              setGraph={setGraph}
+              setMapAnswer={setMapAnswer}
+            />
           </TabPanel>
           <TabPanel value="keywords">
             <div>
               <div className="starting-view-text">Märksõna: </div>
-              <TextField
-                size={"small"}
-                sx={{width: "100%"}}
-                variant="outlined"
-                onChange={(e) => setSelectedKeyword(e.currentTarget.value.trim().split(" "))}
+              <AutoCompleteWithScrollKeywords
+                isMainPage={true}
+                setSelectedKeywords={setSelectedKeywords}
+                selectedKeywords={selectedKeywords}
               />
               <Button
-                disabled={!selectedKeyword[0]}
+                disabled={!selectedKeywords[0]}
                 sx={startingWiewButton}
                 variant={"contained"}
                 onClick={callKeywordQuery}

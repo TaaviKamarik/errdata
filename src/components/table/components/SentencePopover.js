@@ -7,15 +7,14 @@ import SentenceSkeleton from "./SentenceSkeleton";
 import SentenceBox from "./SentenceBox";
 import GraphShowList from "../../namegraph/GraphShowList";
 import {buildGraph} from "../../namegraph/helperfunctions/buildGraph";
+import fetchRequest from "../../../queries/fetchRequest";
 
-const SentencePopover = ({inputArray, rowVal, tyyp, data, selectedCode}) => {
+const SentencePopover = ({data}) => {
   const [anchorEl, setAnchorEl] = useState(null);
-  const [sentenceData, setSentenceData] = useState();
   const [renderData, setRenderData] = useState([]);
-  const getOlemKood = async() => {
-    const connections =  await axios.get(urlValue + `samesentence?nimi=${selectedCode}&kood=${data.olemi_kood}`)
-    const connectionsData = connections.data;
-    setRenderData(connectionsData);
+   const getOlemKood = async() => {
+    const connections =  await fetchRequest({codes: data.sama_lause}, "samesentencecopy")
+    setRenderData(connections);
   }
 
   const handleClose = () => {
@@ -26,6 +25,8 @@ const SentencePopover = ({inputArray, rowVal, tyyp, data, selectedCode}) => {
   const id = open ? 'simple-popover' : undefined;
 
   const handleGetSentences = (event) => {
+    console.log(data.sama_lause)
+    if(data.sama_lause.length === 0) return;
     getOlemKood();
     setAnchorEl(event.currentTarget)
   }
@@ -37,7 +38,7 @@ const SentencePopover = ({inputArray, rowVal, tyyp, data, selectedCode}) => {
 
   return (
     <div>
-      <div className={"same-sentence-click"} onClick={(e) => handleGetSentences(e)}><strong>{data.ykslause === 0 ? "-" : data.ykslause}</strong></div>
+      <div className={"same-sentence-click"} onClick={(e) => handleGetSentences(e)}><strong>{data.sama_lause_nr === 0 ? "-" : data.sama_lause_nr}</strong></div>
       <Popover
         id={id}
         open={open}

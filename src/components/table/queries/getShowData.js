@@ -2,7 +2,7 @@ import axios from "axios";
 import {urlValue} from "../../../constants/constants";
 import {transformedObject} from "../helperfunctions/helperFunctions";
 
-export default function getShowData(olemData, data, setShowData) {
+export default function getShowData(data, setShowData) {
   const promises = []
   data.forEach((show) => {
     promises.push(axios.get(urlValue + "getshowdata", {

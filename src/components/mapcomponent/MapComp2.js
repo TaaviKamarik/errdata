@@ -5,54 +5,22 @@ import MarkerClusterGroup from "react-leaflet-cluster";
 import"./mapcomp2.css";
 import {divIcon} from "leaflet/src/layer";
 import {
-  Box,
   Button,
   Chip,
   CircularProgress,
-  FormControlLabel,
-  FormGroup,
-  IconButton, Popover,
-  Switch,
-  TextField, Tooltip, Typography
+  TextField, Tooltip
 } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
-import FilterAltIcon from '@mui/icons-material/FilterAlt';
-import CloseIcon from '@mui/icons-material/Close';
-import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded';
-import AspectRatioRoundedIcon from '@mui/icons-material/AspectRatioRounded';
-import SentenceSkeleton from "../table/components/SentenceSkeleton";
 import ShowBox from "../table/components/ShowBox";
-import getShowData from "../table/queries/getShowData";
 import {addFilterButton, tabValues} from "../../constants/constants";
 import AutoCompleteWithScroll from "../autocompletewithscroll/AutoCompleteWithScroll";
 import {handleEnterPress} from "../nameTab/helperfunctions/helperFunctions";
 import {handleChipDelete} from "../helperfunctions/helperFunctions";
 
-export default function MapComp2({mapData, inputArray, tabVal, setInputArray, setGraph, queryButtonPressed}) {
-  const [inputText, setInputText] = useState("")
-  const [keyList, setkeyList] = useState([])
-  const [textObjList, setObjTextList] = useState([])
-  const [hasMoreData, setHasMoreData] = useState(true)
-  const [renderItems, setRenderItems] = useState([])
-  const [sliceCounter, setSliceCounter] = useState(50)
-  const [renderCoordinates, setRenderCoordinates] = useState([])
-  const [textList, setTextList] = useState([])
-  const [metaData, setMetaData] = useState([])
-  const [listOfMetadata, setListOfMetadata] = useState([])
-  const [listOfMetaText, setListOfMetaText] = useState([])
-  const [textWindow, setTextWindow] = useState(false)
-  const [selectedIndex, setSelectedIndex] = useState(-1)
-  const [selectedText, setSelectedText] = useState()
-  const [sidePanelWidth, setSidePanelWidth] = useState(0)
-  const [textInnerJoin, setTextInnerJoin] = useState(false)
+export default function MapComp2({mapData, queryButtonPressed}) {
+
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-  const id = open ? 'simple-popover' : undefined;
-  const [showMetadata, setShowMetadata] = useState()
-  const [changedMap, setChangedMap] = useState()
-  const locationTexts = {};
-
-  const [locationData, setLocationData] = useState();
   const [addFilterIsOpen, setAddFilterIsOpen] = useState(false);
 
   const customIcon = new divIcon({
@@ -86,39 +54,6 @@ export default function MapComp2({mapData, inputArray, tabVal, setInputArray, se
 
   return (
     <div>
-    <div className="table-upper-container">
-      <div className="main-word-container">{tabValues.titleSelection[tabVal]}</div>
-      {inputArray.map((filter, index) => {
-        if(inputArray.length > 1) {
-          return(
-            <Chip label={filter} color="primary" style={{borderRadius: "10px", minHeight: "40px", fontSize: "1rem"}} onDelete={(e) => handleChipDelete(e, setInputArray, setGraph)} />
-          )
-        } else {
-          return(
-            <Chip label={filter} color="primary" style={{borderRadius: "10px", minHeight: "40px", fontSize: "1rem"}}/>
-          )
-        }
-      })}
-      {addFilterIsOpen && tabVal === "nameTab" &&
-        <AutoCompleteWithScroll
-          isMainPage={false}
-          nimeData={inputArray}
-          setNimeData={setInputArray}
-          setAddFilterIsOpen={setAddFilterIsOpen}
-        />}
-      {addFilterIsOpen&& tabVal === "keywordTab" &&
-        <TextField onKeyDown={(e) => {handleEnterPress(e, setInputArray, inputArray, setAddFilterIsOpen)}}></TextField>}
-      <Tooltip title={"Lisa nimede filtreid"}>
-        <Button
-          onClick={() => setAddFilterIsOpen(true)}
-          color={"success"}
-          variant="contained"
-          sx={addFilterButton}
-        >
-          <AddIcon fontSize={"medium"}/>
-        </Button>
-      </Tooltip>
-    </div>
     <div style={{position: "relative"}}>
       {mapData ?
         <div style={{position: "relative"}}>
@@ -151,12 +86,11 @@ export default function MapComp2({mapData, inputArray, tabVal, setInputArray, se
                   >
                     <Popup offset={[0, 200]} maxWidth="auto" maxHeight="500" className="map-popup">
                       <div style={{fontSize: "1.5rem", fontWeight: "bold", marginBottom: "1rem"}}>Saadete nimekiri</div>
-                      <ShowBox
+                      {/*<ShowBox
                         data={coordinate}
-                        olemData={inputArray[0]}
                         queryButtonPressed={queryButtonPressed}
                         version={"map"}
-                      />
+                      />*/}
                     </Popup>
                     <LeafletTooltip direction="top" offset={[0, 0]} opacity={1}>
                       <div style={{width: "200px", display: "flex", flexDirection: "column", gap: "0.3em"}}>

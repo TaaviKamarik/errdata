@@ -20,45 +20,14 @@ import {handleEnterPress} from "../../nameTab/helperfunctions/helperFunctions";
 import AddIcon from "@mui/icons-material/Add";
 import {handleChipDelete} from "../../helperfunctions/helperFunctions";
 
-const ThemesTable = ({tabVal, textCodes, setFilterValues, inputArray, filterValues, themes, setInputArray, setGraph}) => {
+const ThemesTableKeyword = ({tabVal, textCodes, setFilterValues, inputArray, filterValues, themes, setInputArray, setGraph, keywordArray}) => {
   const [valueClicked, setValueClicked] = useState(false)
   const [selectedValue, setSelectedValue] = useState("")
   const [marksonaNimeData, setMarksonaNimeData] = useState(false)
   const [addFilterIsOpen, setAddFilterIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const getLemmaData = (e, textCodeArray) => {
-    setValueClicked(true);
-    setMarksonaNimeData(null);
-    axios.post(urlValue + "getmarksonadnimedest", {
-      tekst: textCodeArray,
-      teema: [e.target.innerText],
-      limit: 100000000,
-      page: filterValues.page,
-      sortBy: filterValues.sortBy,
-      sortOrder: filterValues.sortOrder,
-      dateMin: filterValues.dateMin,
-      dateMax: filterValues.dateMax
-    }).then((response) => {
-      const responseAnswer = response.data;
-      responseAnswer.forEach((val, index) => {
-        const shows = val.tekstikood.split(",");
-        const textcodes = [];
-        const years = [];
-        shows.forEach((show) => {
-          const splitValue = show.split(":");
-          textcodes.push(splitValue[0]);
-          years.push(splitValue[1]);
-        })
-        responseAnswer[index].tekstikood = textcodes;
-        responseAnswer[index].years = years;
-      })
-      setMarksonaNimeData(responseAnswer)
-      setSelectedValue(e.target.innerText)
-    })
-  }
-
-  console.log(marksonaNimeData)
+  console.log(keywordArray)
 
   const handleChosenCategoryBack = () => {
     setValueClicked(false);
@@ -116,7 +85,7 @@ const ThemesTable = ({tabVal, textCodes, setFilterValues, inputArray, filterValu
               <TableRow
                 key={row.marksona}
               >
-                <TableCell className="themes-tab-theme-click" onClick={(e) => getLemmaData(e, row.tekstikood)} scope="row">
+                <TableCell className="themes-tab-theme-click" scope="row">
                   {row.marksona}
                 </TableCell>
                 <TableCell>{row.kokku}</TableCell>
@@ -149,4 +118,4 @@ const ThemesTable = ({tabVal, textCodes, setFilterValues, inputArray, filterValu
   );
 };
 
-export default ThemesTable;
+export default ThemesTableKeyword;

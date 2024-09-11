@@ -11,9 +11,9 @@ export default function KeywordTab (
   {
     keywordArray,
     textCodes,
-  }) {
+  }) {/*
 
-  /*  const dataProps = {
+  /!*  const dataProps = {
       tekst: nameTextCodes,
       limit: 20,
       page: 1,
@@ -22,7 +22,7 @@ export default function KeywordTab (
       sortOrder: "DESC",
       dateMin: dateQueryValue[0],
       dateMax: dateQueryValue[1]
-    }*/
+    }*!/
 
   return (
     <div>
@@ -48,5 +48,5 @@ export default function KeywordTab (
         {nameThemes.length > 0 && nameThemes !== "No rows" && <ThemesTable nimeData={nimeData} tabVal={currentTabValue} nameThemes={nameThemes} nameTextCodes={nameTextCodes} url={url} dateValue={dateQueryValue}/>}
       </div>
     </div>
-  );
+  );*/
 };

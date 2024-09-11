@@ -3,14 +3,12 @@ import axios from "axios";
 import {iconButtonStyle, sorterValues, urlValue} from "../../../constants/constants";
 import {CircularProgress, IconButton, Popover} from "@mui/material";
 import SwapVertIcon from "@mui/icons-material/SwapVert";
-import SentenceSkeleton from "./SentenceSkeleton";
 import ShowInnerPopup from "./ShowInnerPopup";
 import {sortShowBoxArray} from "../helperfunctions/helperFunctions";
 import getShowData from "../queries/getShowData";
 
-export default function ShowBox({olemData, data, queryButtonPressed, version}) {
-  const[showData, setShowData] = useState([]);
-  const [showMetaData, setShowMetaData] = useState();
+export default function ShowBox({data, queryButtonPressed, version}) {
+
   const [changedShowMetadata, setChangedShowMetadata] = useState();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
@@ -18,9 +16,9 @@ export default function ShowBox({olemData, data, queryButtonPressed, version}) {
 
   console.log("LAENBOXI")
 
-  useEffect(() => {
-    getShowData(olemData, data.tekstikood, setShowMetaData)
-   /* const fetchDataAndUpdateArray = async () => {
+  /*useEffect(() => {
+    getShowData(data.codeandyear.map(code => code.tekstikood), setShowMetaData)
+    const fetchDataAndUpdateArray = async () => {
       try {
         const updatedDataArray = await Promise.all(data.tekstikood.map(async (item) => {
           // Initiate both fetch requests in parallel for each item
@@ -49,15 +47,14 @@ export default function ShowBox({olemData, data, queryButtonPressed, version}) {
       }
     };
 
-    fetchDataAndUpdateArray();*/
-  }, []);
+    fetchDataAndUpdateArray();
+  }, []);*/
 
-  useEffect(() => {
+  /*useEffect(() => {
     if(!showMetaData) return;
 
     if(queryButtonPressed === "name") {
       const queryList = data.tekstikood.map((item) => {
-        console.log(olemData, data.nimetus, item)
         return axios.get(urlValue + `getnamescount?name=${olemData}&name2=${data.nimetus}&code=${item}`)
       })
 
@@ -72,19 +69,20 @@ export default function ShowBox({olemData, data, queryButtonPressed, version}) {
       })
     } else {
     }
-  }, [showMetaData])
+  }, [showMetaData])*/
 
-  console.log(changedShowMetadata);
 
   return(<div className={"sentence-container loaded-container"}>
-    {changedShowMetadata && <>
+    {/*{data && <>
       <div style={{display: "flex", justifyContent: "space-between"}}>
         <div style={{display: "flex", flexDirection: "column", gap: "0.1em"}}>
           <div style={{display: "flex", alignItems: "center", gap: "0.2em"}}>
+
             <div className="olem-bubble"></div> - <div style={{lineHeight: "16px"}}>{olemData}</div>
+
           </div>
           <div style={{display: "flex", alignItems: "center", gap: "0.2em"}}>
-            <div className="theme-bubble"></div> - <div style={{lineHeight: "16px"}}>{data.lyhilemma || data.nimetus}</div>
+            <div className="theme-bubble"></div> - <div style={{lineHeight: "16px"}}>{data.nimetus}</div>
           </div>
         </div>
         <IconButton sx={iconButtonStyle} onClick={(e) => setAnchorEl(e.currentTarget)} aria-label="filter" size="small"><SwapVertIcon/></IconButton></div>
@@ -107,11 +105,11 @@ export default function ShowBox({olemData, data, queryButtonPressed, version}) {
             return <div className="show-sort-btn" onClick={() => {sortShowBoxArray(sorter.key, sorter.order, changedShowMetadata, setChangedShowMetadata)}}>{sorter.text}</div>
           })}
         </div>
-      </Popover></>}
-    {!changedShowMetadata && <div style={{display: "flex", minHeight: version === "table" && "600px",  justifyContent: "center", alignItems: "center"}}><CircularProgress/></div>}
-    {changedShowMetadata && changedShowMetadata?.map((show, index) => {
+      </Popover></>}*/}
+    {!data && <div style={{display: "flex", minHeight: version === "table" && "600px",  justifyContent: "center", alignItems: "center"}}><CircularProgress/></div>}
+    {data && data?.map((show, index) => {
       return(
-          <ShowInnerPopup show={show} index={index} olemData={olemData} teemaVastus={data.lyhilemma || data.nimetus}/>
+          <ShowInnerPopup show={show} index={index} teemaVastus={data.nimetus}/>
       )
     })}
   </div>)

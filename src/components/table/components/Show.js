@@ -4,25 +4,30 @@ import {Popover} from "@mui/material";
 import SentenceSkeleton from "./SentenceSkeleton";
 import ShowBox from "./ShowBox";
 import getShowData from "../queries/getShowData";
+import fetchRequest from "../../../queries/fetchRequest";
 
-export default function Show({data, olemData, textCodes, queryButtonPressed}) {
+export default function Show({data, queryButtonPressed}) {
   const cellRef = React.useRef();
   const [showMetadata, setShowMetadata] = useState()
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
 
+  const callTextMetadata = async (e) => {
+    const metadata = await fetchRequest({data: data.codeandyear.map((codeandyear) => codeandyear.tekstikood)}, "getshowsmetadata");
+    setShowMetadata(metadata);
+    console.log(metadata)
+    console.log(e.target)
+    setAnchorEl(e.target)
+  }
 
   return (
     <div className="shows-cell" ref={cellRef}>
-      <div onClick={(e) => setAnchorEl(e.currentTarget)}>
+      <div onClick={(e) => callTextMetadata(e)}>
         <span>
           <strong className="show-number-color">
             {data.koodNr}
           </strong>
-          <span className="show-percentage-value">
-            (${(parseInt(data.koodNr) * 100 / textCodes.length).toFixed(0)}%)
-          </span>
         </span>
       </div>
       <Popover
@@ -42,8 +47,7 @@ export default function Show({data, olemData, textCodes, queryButtonPressed}) {
         <div style={{minHeight: "600px", padding: "0.5rem"}}>
           <div style={{fontSize: "1.5rem", fontWeight: "bold", marginBottom: "1rem"}}>Saadete nimekiri</div>
           <ShowBox
-            olemData={olemData}
-            data={data}
+            data={showMetadata}
             queryButtonPressed={queryButtonPressed}
             version={"table"}
           />

@@ -1,26 +1,16 @@
-import React, {FC, useEffect, CSSProperties, useState} from "react";
+import React, {useEffect, useState} from "react";
 
-import {SigmaContainer, useLoadGraph, useRegisterEvents, useSetSettings, useSigma} from "@react-sigma/core";
+import {SigmaContainer, useRegisterEvents, useSetSettings, useSigma} from "@react-sigma/core";
 
 import "@react-sigma/core/lib/react-sigma.min.css";
-import {
-  MultiDirectedGraph,
-  NotFoundGraphError,
-  UsageGraphError
-} from "graphology";
 import axios from "axios";
-import {addFilterButton, tabValues, urlValue} from "../../constants/constants";
-import EdgeCurveProgram, {DEFAULT_EDGE_CURVATURE, indexParallelEdgesIndex} from "@sigma/edge-curve";
+import {urlValue} from "../../constants/constants";
+import EdgeCurveProgram from "@sigma/edge-curve";
 import {EdgeArrowProgram} from "sigma/rendering";
-import {Button, Chip, Popover, TextField, Tooltip} from "@mui/material";
+import {Popover} from "@mui/material";
 import './style/nameGraph.css'
 import GraphShowList from "./GraphShowList";
-import sigma from "sigma";
 import {buildGraph} from "./helperfunctions/buildGraph";
-import {handleChipDelete} from "../helperfunctions/helperFunctions";
-import AutoCompleteWithScroll from "../autocompletewithscroll/AutoCompleteWithScroll";
-import {handleEnterPress} from "../nameTab/helperfunctions/helperFunctions";
-import AddIcon from "@mui/icons-material/Add";
 
 const sigmaStyle = { height: "800px", width: "1600px", border: "1px solid #000", margin: "auto auto"};
 // Sigma settings
@@ -29,7 +19,7 @@ const sigmaSettings = { allowInvalidContainer: true, renderEdgeLabels: true, def
     curved: EdgeCurveProgram,
   } };
 
-const GraphSettings = ({hoveredNode, graph, inputArray}) => {
+const GraphSettings = ({hoveredNode, graph, nameQueryAnswer}) => {
   const setSettings = useSetSettings();
   useEffect(() => {
     setSettings({
@@ -72,7 +62,7 @@ const GraphSettings = ({hoveredNode, graph, inputArray}) => {
         return newData;
       },
     });
-  }, [hoveredNode, setSettings, graph, inputArray]);
+  }, [hoveredNode, setSettings, graph, nameQueryAnswer]);
 }
 
 const GraphEvents = ({setOpen, setAnchorPosition, fetchNameConnectionMetadata, setHoveredNode, setGraph, loadGraph, graph, setNoValuesReturned}) => {
@@ -225,7 +215,7 @@ const GraphEvents = ({setOpen, setAnchorPosition, fetchNameConnectionMetadata, s
   return null;
 };*/
 
-export const NameGraph = ({ inputArray, graph, setGraph, setInputArray }) => {
+export const NameGraph = ({ graph, setGraph, nameQueryAnswer, nameArray }) => {
   console.log("rerendering")
   const [olemKood, setOlemKood] = useState()
   const [noValuesReturned, setNoValuesReturned] = useState(false)
@@ -237,13 +227,10 @@ export const NameGraph = ({ inputArray, graph, setGraph, setInputArray }) => {
 
 
   const getOlemKood = async() => {
-    console.log(graph)
-    const response = await axios.get(urlValue + `getolemkood?name=${inputArray[0]}`);
+    const response = await axios.get(urlValue + `getolemkood?name=${nameArray[0]}`);
     setOlemKood(response.data[0].kood);
     buildGraph(response.data[0].kood, graph, setGraph, setNoValuesReturned);
   }
-
-
 
   const fetchNameConnectionMetadata = (idArray) => {
     axios.post(urlValue + 'getnameconnectionmetadata', {id: idArray}).then(response => {
@@ -263,7 +250,6 @@ export const NameGraph = ({ inputArray, graph, setGraph, setInputArray }) => {
   }, [])
 
   console.log(olemKood)
-  console.log(inputArray[0])
 
   return (
     <div>
@@ -279,7 +265,7 @@ export const NameGraph = ({ inputArray, graph, setGraph, setInputArray }) => {
             setGraph={setGraph}
             setNoValuesReturned={setNoValuesReturned}
           />
-          <GraphSettings hoveredNode={hoveredNode} graph={graph} inputArray={inputArray}/>
+          <GraphSettings hoveredNode={hoveredNode} graph={graph} nameQueryAnswer={nameQueryAnswer}/>
       </SigmaContainer>}
       <Popover
         anchorReference="anchorPosition"

@@ -13,7 +13,7 @@ import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import HelpIcon from '@mui/icons-material/Help';
 import NameTablePagination from "../components/NameTablePagination";
 
-const NameTable = ({inputArray, textCodes, filterValues, setFilterValues, tabVal, queryAnswer, selectedCode, queryButtonPressed}) => {
+const NameTable = ({filterValues, setFilterValues, tabVal, queryAnswer, queryButtonPressed}) => {
   const [sameSentenceValues, setSameSentenceValues] = useState([])
   const [renderData, setRenderData] = useState([])
   const [textCodeArray, setTextCodeArray] = useState([])
@@ -70,31 +70,8 @@ const NameTable = ({inputArray, textCodes, filterValues, setFilterValues, tabVal
               data-order=""
               onClick={(e) => {handleHeaderClick(e)}}
             >
-              Koos mainitud sõna<Tooltip title={"Tekstis esinenud märksõna teemalise sõna algvorm."} placement={"top"}><HelpIcon sx={{fontSize: "0.8em", lineHeight: "0.8em"}}/></Tooltip>
+              {tabVal === "nameTab" ? "Koos mainitud nimi" : "Koos mainitus sõna"}<Tooltip title={tabVal === "nameTab" ? "Valitud nime(de)ga saadetes koos esinev nimi." : "Valitud nime(de)ga saadetes koos esinev märksõna."} placement={"top"}><HelpIcon sx={{fontSize: "0.8em", lineHeight: "0.8em"}}/></Tooltip>
             </th>
-            <th
-              className={"data-table-header"}
-              id={"kokku"}
-              data-order="DESC"
-              onClick={(e) => {handleHeaderClick(e)}}
-            >
-              Koosmainimisi kokku<Tooltip title={"Mitu korda valitud olem ja märksõna tekstides koos esinesid."} placement={"top"}><HelpIcon sx={{fontSize: "0.8em", lineHeight: "0.8em"}}/></Tooltip>
-            </th>
-            {tabVal === "nameTab" && inputArray.length === 1 && <th
-              className={"data-table-header"}
-              id={"ykslause"}
-              onClick={(e) => {handleHeaderClick(e)}}
-            >
-              Seosed lauses<Tooltip title={"Mitu korda valitud olem ja märksõna tekstides koos esinesid."} placement={"top"}><HelpIcon sx={{fontSize: "0.8em", lineHeight: "0.8em"}}/></Tooltip>
-            </th>}
-            {queryAnswer[0].smskoor && <th
-              className={"data-table-header"}
-              id={"smskoor"}
-              data-order=""
-              onClick={(e) => {handleHeaderClick(e)}}
-            >
-              Sõna üldine SM skoor<Tooltip title={"Märksõna SM skoor. SM (Sõnade Mitmekesisuse) skoor mõõdab sõna kasutuse mitmekesisust erinevates kontekstides või tekstides, näidates, kui muutlikult sõna kasutatakse."} placement={"top"}><HelpIcon sx={{fontSize: "0.8em", lineHeight: "0.8em"}}/></Tooltip>
-            </th>}
             {tabVal === "nameTab" && <th
               className={"data-table-header"}
               id={"tyyp"}
@@ -103,8 +80,32 @@ const NameTable = ({inputArray, textCodes, filterValues, setFilterValues, tabVal
                 handleHeaderClick(e)
               }}
             >
-              Nime kategooria<Tooltip title={"Mis kategooriasse nimi jaotatud on."} placement={"top"}><HelpIcon
+              Nime kategooria<Tooltip title={"Nimed jaotuvad kolme rühma: isikud, asukohad ja organisatsioonid."} placement={"top"}><HelpIcon
               sx={{fontSize: "0.8em", lineHeight: "0.8em"}}/></Tooltip>
+            </th>}
+            <th
+              className={"data-table-header"}
+              id={"kokku"}
+              data-order="DESC"
+              onClick={(e) => {handleHeaderClick(e)}}
+            >
+              Koosmainimisi kokku<Tooltip title={tabVal === "nameTab" ? "Kui mitu korda nimed saadetes koos esinevad." : "Kui mitu korda esineb leitud märksõna saadetes, kus on mainitud valitud nime(sid)."} placement={"top"}><HelpIcon sx={{fontSize: "0.8em", lineHeight: "0.8em"}}/></Tooltip>
+            </th>
+            {tabVal === "nameTab" && <th
+              className={"data-table-header"}
+              id={"ykslause"}
+              onClick={(e) => {handleHeaderClick(e)}}
+            >
+              Seosed lauses<Tooltip title={"Kui mitu korda esinevad nimed samas lauses, nii et need on seotud ühise tegevuse\n" +
+              "või omaduse kaudu. Seoste arvul klõpsates avaneb täpsem info."} placement={"top"}><HelpIcon sx={{fontSize: "0.8em", lineHeight: "0.8em"}}/></Tooltip>
+            </th>}
+            {queryAnswer[0].smskoor && <th
+              className={"data-table-header"}
+              id={"smskoor"}
+              data-order=""
+              onClick={(e) => {handleHeaderClick(e)}}
+            >
+              Olulisuse skoor<Tooltip title={"Skoor näitab sõna olulisust võtmesõnana. Mida suurem skoor, seda suurem on sõna statistiline olulisus ehk seda paremini iseloomustab see ERR-i kultuurisaadete arhiivi sisu."} placement={"top"}><HelpIcon sx={{fontSize: "0.8em", lineHeight: "0.8em"}}/></Tooltip>
             </th>}
             <th
               className={"data-table-header"}
@@ -112,33 +113,31 @@ const NameTable = ({inputArray, textCodes, filterValues, setFilterValues, tabVal
               data-order=""
               onClick={(e) => {handleHeaderClick(e)}}
             >
-              Erinevaid saateid<Tooltip title={"Mitmes erinevas saates olem ja märksõna koos esinenud on."} placement={"top"}><HelpIcon sx={{fontSize: "0.8em", lineHeight: "0.8em"}}/></Tooltip>
+              Erinevaid saateid<Tooltip title={"Kui mitmes saates nimed koos esinevad."} placement={"top"}><HelpIcon sx={{fontSize: "0.8em", lineHeight: "0.8em"}}/></Tooltip>
             </th>
             <th
               className={"data-table-header"}
             >
-              Trend<Tooltip title={"Olemi ja märksõna koosesinemise trend aastate lõikes."} placement={"top"}><HelpIcon sx={{fontSize: "0.8em", lineHeight: "0.8em"}}/></Tooltip>
+              Trend<Tooltip title={"Nimede koosesinemise trend aastate lõikes."} placement={"top"}><HelpIcon sx={{fontSize: "0.8em", lineHeight: "0.8em"}}/></Tooltip>
             </th>
           </tr>
         </thead>
         <tbody>
-          {queryAnswer[0] && localQuery.map((data, index) => {
-            if(index >= (page - 1) * 20 && index < page * 20){
+          {/*{queryAnswer[0] && localQuery.map((data, index) => {
               return(
                 <tr key={"row" + index}>
                   <td>{data.lyhilemma || data.nimetus}</td>
+                  {tabVal === "nameTab" && <td>{tyybid[data.tyyp]}</td>}
                   <td>{data.kokku}</td>
+                  {data.smskoor && <td>{parseFloat(data.smskoor).toFixed(3)}</td>}
                   {tabVal === "nameTab" && inputArray.length === 1 &&<td>
                     <SentencePopover
                     key={data.lyhilemma || data.nimetus}
                     data={data}
                     inputArray={inputArray}
                     tyyp={data.tyyp}
-                    selectedCode={selectedCode}
                     />
                   </td>}
-                  {data.smskoor && <td>{parseFloat(data.smskoor).toFixed(3)}</td>}
-                  {tabVal === "nameTab" && <td>{tyybid[data.tyyp]}</td>}
                   <td>
                     <Show
                       olemData={inputArray[0]}
@@ -147,19 +146,18 @@ const NameTable = ({inputArray, textCodes, filterValues, setFilterValues, tabVal
                       queryButtonPressed={queryButtonPressed}
                     />
                   </td>
-                  <td><TrendCell data={data} filterValues={filterValues}/></td>
+                  <td><TrendCell data={data} olemData={inputArray[0]} filterValues={filterValues}/></td>
                 </tr>
               )
-            }
-          })}
+          })}*/}
         </tbody>
       </table>
-      <NameTablePagination
+      {/*<NameTablePagination
         handlePageChange={handlePageChange}
         tableRows={tableRows}
         filterValues={filterValues}
         queryValue={queryAnswer}
-      />
+      />*/}
     </div>
   );
 };

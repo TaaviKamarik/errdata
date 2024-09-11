@@ -3,7 +3,7 @@ import {Popover, Tooltip} from "@mui/material";
 import '../style/showInnerPopup.css'
 import axios from "axios";
 
-const ShowInnerPopup = ({show, url, olemData, teemaVastus}) => {
+const ShowInnerPopup = ({show, teemaVastus}) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const cellRef = React.useRef();
@@ -45,8 +45,11 @@ const ShowInnerPopup = ({show, url, olemData, teemaVastus}) => {
   return (
     <div>
       <div key={show.saatenimi} ref={cellRef} onClick={(e) => setAnchorEl(e.currentTarget)} className="show sentence-inner">
-        <div className="count-marks"><Tooltip title={olemData} placement={"top"}><div className="olem-bubble">{show.olemCount}</div></Tooltip> <Tooltip title={teemaVastus} placement={"top"}><div className="theme-bubble">{show.themeCount}</div></Tooltip></div>
-        <div style={{padding: "0.5em"}}>{show.saatenimi}</div>
+{/*
+        <div className="count-marks"><Tooltip title={"TERE"} placement={"top"}><div className="olem-bubble">{show.olemCount}</div></Tooltip> <Tooltip title={teemaVastus} placement={"top"}><div className="theme-bubble">{show.themeCount}</div></Tooltip></div>
+*/}
+        <div style={{paddingTop: "0.5em", paddingLeft: "0.5em", paddingRight: "0.5em"}}>{show.saatenimi}</div>
+        <div style={{paddingLeft: "0.5em", paddingRight: "0.5em", paddingBottom:"0.5em" ,fontSize: "0.8rem"}}>{show.salvestusaeg} {show.salvestuskoht}</div>
       </div>
       <Popover
         open={open}

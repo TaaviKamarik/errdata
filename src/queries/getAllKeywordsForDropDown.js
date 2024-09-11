@@ -1,8 +1,8 @@
 import axios from "axios";
 import {urlValue} from "../constants/constants";
 
-export default function getAllPeopleForDropDown (page, word, amount, currentPage, setHasMore, setPeopleOptions, setOffset, setPage, setLoading) {
-  axios.get(urlValue + "people", {
+export default function getAllKeywordsForDropDown (page, word, amount, currentPage, setHasMore, setPeopleOptions, setOffset, setPage, setLoading) {
+  axios.get(urlValue + "keywords", {
     params: {
       word: word,
       amount: amount,
@@ -12,11 +12,7 @@ export default function getAllPeopleForDropDown (page, word, amount, currentPage
     if (response.data === "No rows") {
       setHasMore(false);
     } else {
-      if(page === 0) {
-        setPeopleOptions(response.data);
-      } else {
-        setPeopleOptions(prevOptions => [...prevOptions, ...response.data]);
-      }
+      setPeopleOptions(prevOptions => [...prevOptions, ...response.data]);
       setOffset(page * amount);
       setPage(page + 1);
     }
