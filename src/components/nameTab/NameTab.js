@@ -24,9 +24,9 @@ export default function NameTab (
 
   return (
     <div>
-      <div className="table-upper-container">
+{/*      <div className="table-upper-container">
         <div className="main-word-container">{tabValues.titleSelection[tabVal]}</div>
-      </div>
+      </div>*/}
       {!queryAnswer.length === 0 && <Alert severity="warning">Nime kohta ei leitud infot. Muuda filtrites aastaarve ja proovi uuesti!</Alert>}
       {queryAnswer &&
         <NameTable

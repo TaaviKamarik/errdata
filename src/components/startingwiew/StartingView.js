@@ -11,20 +11,28 @@ import AutoCompleteWithScrollKeywords from "../autocompletewithscroll/AutoComple
 import {tabValues, urlValue} from "../../constants/constants";
 import axios from "axios";
 import NameInput from "../nameview/NameInput";
+import KeywordInput from "../keywordview/KeywordInput";
 
-const StartingView = ({setNameArray, setKeywordArray, setQueryButtonPressed, setGraph, setNameQueryAnswer, setMapAnswer}) => {
+const StartingView = (
+  {
+    setIsKeywordsLoading,
+    keywordArray,
+    filterValues,
+    nameArray,
+    setNameArray,
+    setKeywordArray,
+    setQueryButtonPressed,
+    setGraph,
+    setNameQueryAnswer,
+    setMapAnswer,
+    setIsLoading,
+    setNameKeywordQueryAnswer
+  }) => {
   const [modeValue, setModeValue] = useState('names');
 
 
   const [selectedKeywords, setSelectedKeywords] = useState([]);
 
-  const [filterValues, setFilterValues] = useState({
-    dateMin: 2000,
-    dateMax: 2023,
-    sortBy: "kokku",
-    sortOrder: "DESC",
-    page: 1,
-  })
 
   const handleModeChange = (event, newValue) => {
     setModeValue(newValue)
@@ -47,30 +55,33 @@ const StartingView = ({setNameArray, setKeywordArray, setQueryButtonPressed, set
           </Box>
           <TabPanel value="names">
             <NameInput
+              filterValues={filterValues}
+              setNameKeywordQueryAnswer={setNameKeywordQueryAnswer}
+              isTableView={false}
               setNameArray={setNameArray}
+              nameArray={nameArray}
               setNameQueryAnswer={setNameQueryAnswer}
               setQueryButtonPressed={setQueryButtonPressed}
               setGraph={setGraph}
               setMapAnswer={setMapAnswer}
+              setIsLoading={setIsLoading}
+              setIsKeywordsLoading={setIsKeywordsLoading}
             />
           </TabPanel>
           <TabPanel value="keywords">
-            <div>
-              <div className="starting-view-text">Märksõna: </div>
-              <AutoCompleteWithScrollKeywords
-                isMainPage={true}
-                setSelectedKeywords={setSelectedKeywords}
-                selectedKeywords={selectedKeywords}
-              />
-              <Button
-                disabled={!selectedKeywords[0]}
-                sx={startingWiewButton}
-                variant={"contained"}
-                onClick={callKeywordQuery}
-              >
-                Saada päring
-              </Button>
-            </div>
+            <KeywordInput
+              filterValues={filterValues}
+              setNameKeywordQueryAnswer={setNameKeywordQueryAnswer}
+              isTableView={false}
+              setNameArray={setKeywordArray}
+              nameArray={keywordArray}
+              setNameQueryAnswer={setNameQueryAnswer}
+              setQueryButtonPressed={setQueryButtonPressed}
+              setGraph={setGraph}
+              setMapAnswer={setMapAnswer}
+              setIsLoading={setIsLoading}
+              setIsKeywordsLoading={setIsKeywordsLoading}
+            />
           </TabPanel>
         </TabContext>
       </Paper>

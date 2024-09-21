@@ -22,7 +22,6 @@
 }
 
 .filter-container {
-  width: 100%;
   position: absolute;
   background-color: white;
   padding: 0 1.5rem 1em;
@@ -46,7 +45,6 @@
 .border-bottom {
   display: flex;
   gap: 1em;
-  width: 100%;
   border-bottom: 1px solid gray;
 }
 
@@ -57,4 +55,8 @@
   padding: 0 0.5em;
   border-radius: 15px;
 
+}
+
+* {
+  box-sizing: border-box;
 }

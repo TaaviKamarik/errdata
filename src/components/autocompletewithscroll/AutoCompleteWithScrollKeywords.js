@@ -6,7 +6,7 @@ import {handleScroll} from "./helperfunctions/helperFunctions";
 import useFetchOnPeopleInputChange from "./hooks/useFetchOnPeopleInputChange";
 import getAllKeywordsForDropDown from "../../queries/getAllKeywordsForDropDown";
 
-export default function AutoCompleteWithScrollKeywords ({isMainPage, setSelectedKeywords, selectedKeywords}) {
+export default function AutoCompleteWithScrollKeywords ({isMainPage, setSelectedKeywords, selectedKeywords, keywordArray}) {
   const [inputValue, setInputValue] = useState('');
   const [prevInputValue, setPrevInputValue] = useState();
   const [peopleOptions, setPeopleOptions] = useState([]);
@@ -41,7 +41,7 @@ export default function AutoCompleteWithScrollKeywords ({isMainPage, setSelected
       fullWidth
       multiple
       options={peopleOptions}
-      defaultValue={selectedKeywords[0]}
+      defaultValue={keywordArray}
       onInputChange={(event, newInputValue) => {
         setInputValue(newInputValue);
         setPeopleOptions([]); // Clear options on input change

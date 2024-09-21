@@ -6,14 +6,16 @@ import SentencePopover from "../table/components/SentencePopover";
 import Show from "../table/components/Show";
 import TrendCell from "../table/components/TrendCell";
 import FilterPopUp from "../FilterPopUp";
-import SortIcon from '@mui/icons-material/Sort';
 import InputFilter from "../filterinners/InputFilter";
 import CheckBoxFilter from "../filterinners/checkBoxFilter";
 import SliderFilter from "../filterinners/SliderFilter";
 import NameTablePagination from "../table/components/NameTablePagination";
 import SortButton from "../SortButton";
+import KeywordTypeFilter from "../filterinners/KeywordTypeFilter";
+import KeywordsInputFilter from "../filterinners/KeywordsInputFilter";
+import KeywordsSliderFilter from "../filterinners/KeywordsSliderFilter";
 
-const NameNameTable = (
+const NameKeywordsTable = (
   {
     filterValues,
     tabVal,
@@ -31,10 +33,12 @@ const NameNameTable = (
   const [localQuery, setLocalQuery] = useState(queryAnswer);
   const controller = new AbortController();
   const tyybid = {loc: "Asukoht", org: "Organisatsioon", per: "Isik"}
-  const [sortValues, setSortValues] = useState({nimetus: "", tyyp: "", kokku: "", sama_lause_nr: "D", koodNr: "", minYear: "", maxYear: ""})
+  const [sortValues, setSortValues] = useState({lyhilemma: "", tyyp: "", suurim_sm: "D", keskmine_sm: "", total: "", koodNr: "", minYear: "", maxYear: ""})
   const [filteredData, setFilteredData] = useState(queryAnswer);
-  const [filterBooleans, setFilterBooleans] = useState({nameFilter: "", categoryFilter: ["per", "org", "loc"], totalFilter: [], sameSentFilter: [], differentShowFilter: [], yearFilter: []})
+  const [uniqueValues, setUniqueValues] = useState([...new Set(queryAnswer.flatMap(item => item.marksonad))])
+  const [filterBooleans, setFilterBooleans] = useState({keywordFilter: "", categoryFilter: uniqueValues, maxSmFilter: [], avgSmFilter: [], totalFilter: [], differentShowFilter: [], yearFilter: []})
 
+  console.log(queryAnswer)
   const handlePageChange = (event, value) => {
     setPage(value);
     controller.abort()
@@ -45,7 +49,7 @@ const NameNameTable = (
 
     const newDirection = currentDirection === "" || currentDirection === "A" ? "D" : "A";
 
-    const newSortValues = {nimetus: "", tyyp: "", kokku: "", sama_lause_nr: "", koodNr: "", minYear: "", maxYear: ""}
+    const newSortValues = {lyhilemma: "", tyyp: "", suurim_sm: "", keskmine_sm: "", total: "", saateid: "", minYear: "", maxYear: ""}
     newSortValues[ID] = newDirection;
 
     setSortValues(newSortValues);
@@ -95,82 +99,125 @@ const NameNameTable = (
             className={"data-table-header"}
           >
             <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
-              <span>Koos mainitud nimi<Tooltip title="Valitud nime(de)ga saadetes koos esinev nimi." placement={"top"}><HelpIcon sx={{fontSize: "0.8em", lineHeight: "0.8em"}}/></Tooltip></span>
+              <span>Märksõna<Tooltip title="Valitud nime(de)ga saadetes koos esinev nimi." placement={"top"}><HelpIcon sx={{fontSize: "0.8em", lineHeight: "0.8em"}}/></Tooltip></span>
               <span style={{display: "flex", alignItems: "center"}}>
-                <SortButton handleHeaderClick={handleHeaderClick} tableColumn={"nimetus"} sortValues={sortValues}/>
-                <FilterPopUp filterElement = {<InputFilter filterBooleans={filterBooleans} setFilterBooleans={setFilterBooleans} queryAnswer={queryAnswer} setFilteredData={setFilteredData}/>}/>
+                <SortButton handleHeaderClick={handleHeaderClick} tableColumn={"lyhilemma"} sortValues={sortValues}/>
+                <FilterPopUp filterElement = {
+                  <KeywordsInputFilter
+                    uniqueValues={uniqueValues}
+                    filterBooleans={filterBooleans}
+                    setFilterBooleans={setFilterBooleans}
+                    queryAnswer={queryAnswer}
+                    setFilteredData={setFilteredData}/>}
+                />
               </span>
             </div>
           </th>
-          {tabVal === "nameTab" && <th
+          <th
             className={"data-table-header"}
           >
             <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
-              <span>Nime kategooria<Tooltip title="Nimed jaotuvad kolme rühma: isikud, asukohad ja organisatsioonid." placement={"top"}><HelpIcon sx={{fontSize: "0.8em", lineHeight: "0.8em"}}/></Tooltip></span>
+              <span>Liigitus<Tooltip title="Nimed jaotuvad kolme rühma: isikud, asukohad ja organisatsioonid." placement={"top"}><HelpIcon sx={{fontSize: "0.8em", lineHeight: "0.8em"}}/></Tooltip></span>
               <span style={{display: "flex", alignItems: "center"}}>
-                <SortButton handleHeaderClick={handleHeaderClick} tableColumn={"tyyp"} sortValues={sortValues}/>
-                <FilterPopUp filterElement = {<CheckBoxFilter filterBooleans={filterBooleans} setFilterBooleans={setFilterBooleans} queryAnswer={queryAnswer} setFilteredData={setFilteredData}/>}/>
+                <FilterPopUp
+                  filterElement =
+                    {<KeywordTypeFilter
+                      uniqueValues={uniqueValues}
+                      filterBooleans={filterBooleans}
+                      setFilterBooleans={setFilterBooleans}
+                      queryAnswer={queryAnswer}
+                      setFilteredData={setFilteredData}/>}
+                />
               </span>
             </div>
-          </th>}
+          </th>
+          <th
+            className={"data-table-header"}
+          >
+            <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+              <span>Suurim SM<Tooltip title="Kui mitu korda esinevad nimed samas lauses, nii et need on seotud ühise tegevuse\n või omaduse kaudu. Seoste arvul klõpsates avaneb täpsem info." placement={"top"}><HelpIcon sx={{fontSize: "0.8em", lineHeight: "0.8em"}}/></Tooltip></span>
+              <span style={{display: "flex", alignItems: "center"}}>
+                <SortButton handleHeaderClick={handleHeaderClick} tableColumn={"suurim_sm"} sortValues={sortValues}/>
+                <FilterPopUp
+                  filterElement =
+                    {<KeywordsSliderFilter
+                      filterBooleans={filterBooleans}
+                      setFilterBooleans={setFilterBooleans}
+                      queryAnswer={queryAnswer}
+                      setFilteredData={setFilteredData}
+                      filterName={"maxSmFilter"}
+                      attributeName={"suurim_sm"}
+                      uniqueValues={uniqueValues}
+                      step={0.0001}
+                    />}
+                />
+              </span>
+            </div>
+          </th>
+          <th
+            className={"data-table-header"}
+          >
+            <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+              <span>Keskmine SM<Tooltip title="Kui mitu korda esinevad nimed samas lauses, nii et need on seotud ühise tegevuse\n või omaduse kaudu. Seoste arvul klõpsates avaneb täpsem info." placement={"top"}><HelpIcon sx={{fontSize: "0.8em", lineHeight: "0.8em"}}/></Tooltip></span>
+              <span style={{display: "flex", alignItems: "center"}}>
+                <SortButton handleHeaderClick={handleHeaderClick} tableColumn={"keskmine_sm"} sortValues={sortValues}/>
+                <FilterPopUp
+                  filterElement =
+                    {<KeywordsSliderFilter
+                      filterBooleans={filterBooleans}
+                      setFilterBooleans={setFilterBooleans}
+                      queryAnswer={queryAnswer}
+                      setFilteredData={setFilteredData}
+                      filterName={"avgSmFilter"}
+                      attributeName={"keskmine_sm"}
+                      uniqueValues={uniqueValues}
+                      step={0.0001}
+                    />}
+                />
+              </span>
+            </div>
+          </th>
           <th
             className={"data-table-header"}
           >
             <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
               <span>Koosmainimisi<Tooltip title="Kui mitu korda nimed saadetes koos esinevad." placement={"top"}><HelpIcon sx={{fontSize: "0.8em", lineHeight: "0.8em"}}/></Tooltip></span>
               <span style={{display: "flex", alignItems: "center"}}>
-                <SortButton handleHeaderClick={handleHeaderClick} tableColumn={"kokku"} sortValues={sortValues}/>
+                <SortButton handleHeaderClick={handleHeaderClick} tableColumn={"total"} sortValues={sortValues}/>
                 <FilterPopUp
                   filterElement =
-                    {<SliderFilter
+                    {<KeywordsSliderFilter
                       filterBooleans={filterBooleans}
                       setFilterBooleans={setFilterBooleans}
                       queryAnswer={queryAnswer}
                       setFilteredData={setFilteredData}
                       filterName={"totalFilter"}
-                      attributeName={"kokku"}
+                      attributeName={"total"}
+                      uniqueValues={uniqueValues}
+                      step={1}
                     />}
                 />
               </span>
             </div>
           </th>
-          {tabVal === "nameTab" && <th
-            className={"data-table-header"}
-          >
-            <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
-              <span>Seosed lauses<Tooltip title="Kui mitu korda esinevad nimed samas lauses, nii et need on seotud ühise tegevuse\n või omaduse kaudu. Seoste arvul klõpsates avaneb täpsem info." placement={"top"}><HelpIcon sx={{fontSize: "0.8em", lineHeight: "0.8em"}}/></Tooltip></span>
-              <span style={{display: "flex", alignItems: "center"}}>
-                <SortButton handleHeaderClick={handleHeaderClick} tableColumn={"sama_lause_nr"} sortValues={sortValues}/>
-                <FilterPopUp
-                  filterElement =
-                    {<SliderFilter
-                      filterBooleans={filterBooleans}
-                      setFilterBooleans={setFilterBooleans}
-                      queryAnswer={queryAnswer}
-                      setFilteredData={setFilteredData}
-                      filterName={"sameSentFilter"}
-                      attributeName={"sama_lause_nr"}
-                    />}
-                />
-              </span>
-            </div>
-          </th>}
           <th
             className={"data-table-header"}
           >
             <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
-              <span>Erinevaid saateid<Tooltip title="Kui mitmes saates nimed koos esinevad." placement={"top"}><HelpIcon sx={{fontSize: "0.8em", lineHeight: "0.8em"}}/></Tooltip></span>
+              <span>Erinevaid saateid<Tooltip title="Kui mitu korda esinevad nimed samas lauses, nii et need on seotud ühise tegevuse\n või omaduse kaudu. Seoste arvul klõpsates avaneb täpsem info." placement={"top"}><HelpIcon sx={{fontSize: "0.8em", lineHeight: "0.8em"}}/></Tooltip></span>
               <span style={{display: "flex", alignItems: "center"}}>
                 <SortButton handleHeaderClick={handleHeaderClick} tableColumn={"koodNr"} sortValues={sortValues}/>
                 <FilterPopUp
                   filterElement =
-                    {<SliderFilter
+                    {<KeywordsSliderFilter
                       filterBooleans={filterBooleans}
                       setFilterBooleans={setFilterBooleans}
                       queryAnswer={queryAnswer}
                       setFilteredData={setFilteredData}
                       filterName={"differentShowFilter"}
                       attributeName={"koodNr"}
+                      uniqueValues={uniqueValues}
+                      step={1}
                     />}
                 />
               </span>
@@ -180,11 +227,7 @@ const NameNameTable = (
             className={"data-table-header"}
           >
             <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
-              <span>Aastavahemik<Tooltip title="Saadete esinemise aastavahemik." placement={"top"}><HelpIcon sx={{fontSize: "0.8em", lineHeight: "0.8em"}}/></Tooltip></span>
-              <span style={{display: "flex", alignItems: "center"}}>
-                {/*<SortIcon style={{cursor: "pointer"}} data-order="DESC" id={"kokku"} onClick={(e) => {handleHeaderClick(e)}}/>*/}
-                <FilterPopUp/>
-              </span>
+              <span>Aastavahemik<Tooltip title="Kui mitmes saates nimed koos esinevad." placement={"top"}><HelpIcon sx={{fontSize: "0.8em", lineHeight: "0.8em"}}/></Tooltip></span>
             </div>
           </th>
           <th
@@ -195,26 +238,28 @@ const NameNameTable = (
         </tr>
         </thead>
         <tbody>
-        {filteredData.map((data, index) => {
+        {filteredData?.map((data, index) => {
           if (index < (page - 1) * tableRows || index >= page * tableRows) {
             return null;
           }
           return(
             <tr key={"row" + index}>
-              <td>{data.nimetus}</td>
-              <td>{tyybid[data.tyyp]}</td>
-              <td>{data.kokku}</td>
-              <td>
-                <SentencePopover data={data}/>
-              </td>
+              <td>{data.lyhilemma}</td>
+              <td>{data.marksonad.join(", ")}</td>
+              <td>{data.suurim_sm}</td>
+              <td>{data.keskmine_sm}</td>
+              <td>{data.total}</td>
               <td>
                <Show
                   data={data}
                   queryButtonPressed={queryButtonPressed}
                 />
               </td>
+              {/*<td>
+                <SentencePopover data={data}/>
+              </td>*/}
               <td>
-                {data.minYear} - {data.maxYear}
+                {data.min_aasta} - {data.max_aasta}
               </td>
               <td><TrendCell data={data} filterValues={filterValues}/></td>
             </tr>
@@ -232,4 +277,4 @@ const NameNameTable = (
   );
 };
 
-export default NameNameTable;
+export default NameKeywordsTable;

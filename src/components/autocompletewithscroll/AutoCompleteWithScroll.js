@@ -4,6 +4,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import getAllPeopleForDropDown from "../../queries/getAllPeopleForDropDown";
 import {handleScroll} from "./helperfunctions/helperFunctions";
 import useFetchOnPeopleInputChange from "./hooks/useFetchOnPeopleInputChange";
+import {Chip} from "@mui/material";
 
 export default function AutoCompleteWithScroll (props) {
   const [inputValue, setInputValue] = useState('');
@@ -31,15 +32,16 @@ export default function AutoCompleteWithScroll (props) {
 
   const handleSelect = (event, value) => {
     props.setNimeData(value)
-    !props.isMainPage && props.setAddFilterIsOpen(false);
   }
+
+  console.log(props.nameArray)
 
   return (
     <Autocomplete
       sx={{width: "auto !important"}}
       noOptionsText=""
       size="small"
-      defaultValue={props.nimeData[0]}
+      defaultValue={() => props.nameArray.map((person) => ({"nimetus": person}))}
       fullWidth
       multiple
       options={peopleOptions}
@@ -48,7 +50,7 @@ export default function AutoCompleteWithScroll (props) {
         setInputValue(newInputValue);
         setPeopleOptions([]); // Clear options on input change
         setPage(0); // Reset page counter
-        setHasMore(true); // Reset hasMore flag
+        setHasMore(true);// Reset hasMore flag
       }}
       renderInput={(params) =>
         <TextField
@@ -56,7 +58,7 @@ export default function AutoCompleteWithScroll (props) {
           variant={"outlined"}
           {...params}
           label={props.label}
-          style={!props.isMainPage ? {width: "100%"} : {}}
+          style={props.isTableView ? {minWidth: "300px"} : {width: "100%"}}
            />}
       onChange={
         (event, value) => handleSelect(event, value)

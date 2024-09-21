@@ -6,6 +6,13 @@ import fetchRequest from "./queries/fetchRequest";
 import {tabValues, urlValue} from "./constants/constants";
 import {tableDataProps} from "./components/nameTab/constants/constants";
 import NameViews from "./components/nameview/NameViews";
+import { infinity } from 'ldrs'
+import {FourSquare, ThreeDot} from "react-loading-indicators";
+import KeywordViews from "./components/keywordview/KeywordViews";
+
+infinity.register()
+
+
 
 function App() {
   const url = "https://dti.tlu.ee/errlinked/api/src/"
@@ -35,6 +42,7 @@ function App() {
 
   const [nameArray, setNameArray] = useState([]);
   const [nameQueryAnswer, setNameQueryAnswer] = useState();
+  const [nameKeywordQueryAnswer, setNameKeywordQueryAnswer] = useState();
 
 
   const [inputArray, setInputArray] = useState();
@@ -46,6 +54,9 @@ function App() {
   const [marksonaList, setMarksonaList] = useState([]);
 
   const [queryProps, setQueryProps] = useState();
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [isKeywordsLoading, setIsKeywordsLoading] = useState(false);
 
   useEffect(() => {
     if (!inputArray) return;
@@ -104,7 +115,7 @@ function App() {
     }
   },[inputArray, filterValues])
 
-
+  console.log(mapAnswer)
   const callKeywordQuery = async() => {
     const keywords = await fetchRequest({marksonad: inputArray[0]}, "gettextcodesbykeyword");
     console.log(keywords);
@@ -164,17 +175,43 @@ function App() {
 
   return (
     <div className="App">
-      {!queryButtonPressed &&
+      {isLoading && <div style={{height: "100vh", width: "100vw", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
+        <l-infinity
+          size="100"
+          stroke="10"
+          stroke-length="0.15"
+          bg-opacity="0.1"
+          speed="1"
+          color="#004792"
+        ></l-infinity>
+        <div>
+          <h1 style={{color: "#004792"}}>Päringu teostamine</h1>
+        </div>
+      </div>}
+      {!queryButtonPressed && !isLoading &&
         <StartingView
+          setIsKeywordsLoading={setIsKeywordsLoading}
+          keywordArray={keywordArray}
+          filterValues={filterValues}
           setNameArray={setNameArray}
           setKeywordArray={setKeywordArray}
           setQueryButtonPressed={setQueryButtonPressed}
           setGraph={setGraph}
           setNameQueryAnswer={setNameQueryAnswer}
           setMapAnswer={setMapAnswer}
+          nameArray={nameArray}
+          setIsLoading={setIsLoading}
+          setNameKeywordQueryAnswer={setNameKeywordQueryAnswer}
         />}
-      {queryButtonPressed &&
+      {queryButtonPressed === "name" && !isLoading &&
         <NameViews
+          isKeywordsLoading={isKeywordsLoading}
+          isLoading={isLoading}
+          filterValues={filterValues}
+          nameKeywordQueryAnswer={nameKeywordQueryAnswer}
+          setNameKeywordQueryAnswer={setNameKeywordQueryAnswer}
+          setIsLoading={setIsLoading}
+          setIsKeywordsLoading={setIsKeywordsLoading}
           setQueryButtonPressed={setQueryButtonPressed}
           queryButtonPressed={queryButtonPressed}
           setGraph={setGraph}
@@ -182,6 +219,29 @@ function App() {
           graph={graph}
           nameArray={nameArray}
           mapAnswer={mapAnswer}
+          setNameArray={setNameArray}
+          setNameQueryAnswer={setNameQueryAnswer}
+          setMapAnswer={setMapAnswer}
+        />}
+      {queryButtonPressed === "keyword" && !isLoading &&
+        <KeywordViews
+          isKeywordsLoading={isKeywordsLoading}
+          isLoading={isLoading}
+          filterValues={filterValues}
+          nameKeywordQueryAnswer={nameKeywordQueryAnswer}
+          setNameKeywordQueryAnswer={setNameKeywordQueryAnswer}
+          setIsLoading={setIsLoading}
+          setIsKeywordsLoading={setIsKeywordsLoading}
+          setQueryButtonPressed={setQueryButtonPressed}
+          queryButtonPressed={queryButtonPressed}
+          setGraph={setGraph}
+          nameQueryAnswer={nameQueryAnswer}
+          graph={graph}
+          nameArray={keywordArray}
+          mapAnswer={mapAnswer}
+          setNameArray={setKeywordArray}
+          setNameQueryAnswer={setNameQueryAnswer}
+          setMapAnswer={setMapAnswer}
         />}
     </div>
   );

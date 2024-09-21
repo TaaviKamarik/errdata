@@ -1,7 +1,7 @@
 .data-table {
     min-width: 100%;
     max-width: 100%;
-    padding: 1.5rem;
+
 }
 
 th, td {
@@ -35,7 +35,6 @@ td {
 .data-table-header:nth-child(3),
 .data-table-header:nth-child(4),
 .data-table-header:nth-child(5) {
-    cursor: pointer;
 }
 
 .same-sentence-click {
@@ -51,6 +50,7 @@ table {
 .table-pagination {
     display: flex;
     justify-content: center;
+    align-items: center;
     padding: 1rem;
 }
 

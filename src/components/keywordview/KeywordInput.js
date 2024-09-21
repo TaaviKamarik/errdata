@@ -4,6 +4,7 @@ import {Box, Button} from "@mui/material";
 import {startingWiewButton} from "../startingwiew/constants/constants";
 import fetchRequest from "../../queries/fetchRequest";
 import {MultiDirectedGraph} from "graphology";
+import AutoCompleteWithScrollKeywords from "../autocompletewithscroll/AutoCompleteWithScrollKeywords";
 
 const styles = {
   tableViewStyle: {
@@ -23,7 +24,7 @@ const styles = {
   }
 }
 
-const NameInput = (
+const KeywordInput = (
   {
     setIsKeywordsLoading,
     filterValues,
@@ -37,16 +38,17 @@ const NameInput = (
     isTableView,
     setNameKeywordQueryAnswer
   }) => {
-  const [selectedName, setSelectedName] = useState([]);
-  const [selectedNameCode, setSelectedNameCode] = useState([]);
+  const [selectedKeywords, setSelectedKeywords] = useState([]);
+  const [selectedKeywordCode, setSelectedKeywordCode] = useState([]);
 
-  const callNameQuery = async() => {
+  const callKeywordQuery = async() => {
     setIsLoading(true);
     setIsKeywordsLoading(true);
-    const names = selectedName.map(name => name.nimetus);
-    const codes = selectedName.map(name => name.kood);
-    setNameArray(names);
-    const namesTextCodesResult = await fetchRequest({tekst: names, minYear: filterValues.dateMin, maxYear: filterValues.dateMax}, "gettextcodesbynamecopy");
+    console.log(selectedKeywords)
+    const keywords = selectedKeywords[0];
+    console.log(keywords)
+    setNameArray(keywords);
+    const namesTextCodesResult = await fetchRequest({marksonad: keywords, minYear: filterValues.dateMin, maxYear: filterValues.dateMax}, "gettextcodesbykeyword");
     console.log(namesTextCodesResult)
     if(namesTextCodesResult !== "No rows") {
       const props = {
@@ -55,14 +57,12 @@ const NameInput = (
         sortBy: "kokku",
         sortOrder: "DESC",
         page: 1,
-        nimi: names,
         limit: 10000000000,
         tekst: namesTextCodesResult,
-        codes: codes
       }
-      const queryRes = await fetchRequest(props, "getnimednimedestcopy");
+      const queryRes = await fetchRequest(props, "getnimedmarksonadestcopy");
       setNameQueryAnswer(queryRes)
-      setQueryButtonPressed("name");
+      setQueryButtonPressed("keyword");
       setGraph(new MultiDirectedGraph())
       const filteredQuery = queryRes.filter((val) => val.tyyp === 'loc');
       setIsLoading(false);
@@ -74,7 +74,8 @@ const NameInput = (
       }).filter(obj => 'laiuskraad' in obj && 'pikkuskraad' in obj);
       setMapAnswer(mergedArray);
 
-      const keywordResponse = await fetchRequest({codes: namesTextCodesResult}, "getmarksonadnimedestcopy");
+      const keywordResponse = await fetchRequest({keywords: keywords, dateMin: filterValues.dateMin, dateMax: filterValues.dateMax}, "getmarksonadmarksonadest");
+      console.log(keywordResponse)
       setNameKeywordQueryAnswer(keywordResponse)
       setIsKeywordsLoading(false);
     }
@@ -82,19 +83,17 @@ const NameInput = (
 
   return (
     <Box sx={isTableView && styles.tableViewStyle}>
-      {!isTableView && <div className="starting-view-text">Nimed: </div>}
-      <AutoCompleteWithScroll
-        isTableView={isTableView}
-        nameArray={nameArray}
-        setNimeData={setSelectedName}
-        nimeData={selectedName}
-        selectedNameCode={selectedNameCode}
-        setSelectedNameCode={setSelectedNameCode}
+      {!isTableView && <div className="starting-view-text">Märksõnad: </div>}
+      <AutoCompleteWithScrollKeywords
+        keywordArray={nameArray}
+        isMainPage={true}
+        setSelectedKeywords={setSelectedKeywords}
+        selectedKeywords={selectedKeywords}
       />
       <Button
-        disabled={!selectedName[0]}
+        disabled={!selectedKeywords[0]}
         sx={isTableView ? styles.buttonStyle : startingWiewButton}
-        onClick={callNameQuery}
+        onClick={callKeywordQuery}
         variant={"contained"}
       >
         Saada päring
@@ -103,4 +102,4 @@ const NameInput = (
   );
 };
 
-export default NameInput;
+export default KeywordInput;

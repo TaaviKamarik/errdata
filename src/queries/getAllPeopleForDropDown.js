@@ -2,7 +2,7 @@ import axios from "axios";
 import {urlValue} from "../constants/constants";
 
 export default function getAllPeopleForDropDown (page, word, amount, currentPage, setHasMore, setPeopleOptions, setOffset, setPage, setLoading) {
-  axios.get(urlValue + "people", {
+  axios.get(urlValue + "peoplenew", {
     params: {
       word: word,
       amount: amount,

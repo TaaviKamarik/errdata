@@ -16,10 +16,12 @@ import {addFilterButton, tabValues} from "../../constants/constants";
 import AutoCompleteWithScroll from "../autocompletewithscroll/AutoCompleteWithScroll";
 import {handleEnterPress} from "../nameTab/helperfunctions/helperFunctions";
 import {handleChipDelete} from "../helperfunctions/helperFunctions";
+import fetchRequest from "../../queries/fetchRequest";
 
 export default function MapComp2({mapData, queryButtonPressed}) {
 
   const [anchorEl, setAnchorEl] = useState(null);
+  const [showsData, setShowsData] = useState([]);
   const open = Boolean(anchorEl);
   const [addFilterIsOpen, setAddFilterIsOpen] = useState(false);
 
@@ -52,6 +54,14 @@ export default function MapComp2({mapData, queryButtonPressed}) {
       className: "cluster-other"});
   };
 
+  const callShowsData = async(event, codeandyear) => {
+    const metadata = await fetchRequest({data: codeandyear.map((entry) => entry.tekstikood)}, "getshowsmetadata");
+    setShowsData(metadata);
+    event.target.openPopup();
+  }
+
+  console.log(mapData)
+
   return (
     <div>
     <div style={{position: "relative"}}>
@@ -80,17 +90,16 @@ export default function MapComp2({mapData, queryButtonPressed}) {
                     icon={customIcon}
                     eventHandlers={{
                       click: (event) => {
-                        event.target.openPopup();
+                        callShowsData(event, coordinate.codeandyear)
                       },
                     }}
                   >
                     <Popup offset={[0, 200]} maxWidth="auto" maxHeight="500" className="map-popup">
                       <div style={{fontSize: "1.5rem", fontWeight: "bold", marginBottom: "1rem"}}>Saadete nimekiri</div>
-                      {/*<ShowBox
-                        data={coordinate}
-                        queryButtonPressed={queryButtonPressed}
+                      <ShowBox
+                        data={showsData}
                         version={"map"}
-                      />*/}
+                      />
                     </Popup>
                     <LeafletTooltip direction="top" offset={[0, 0]} opacity={1}>
                       <div style={{width: "200px", display: "flex", flexDirection: "column", gap: "0.3em"}}>

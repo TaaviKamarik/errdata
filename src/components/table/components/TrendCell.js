@@ -22,6 +22,7 @@ const TrendWindow = ({data, years, chartData}) => {
   const open = Boolean(anchorEl);
   const [axisYear, setAxisYear] = React.useState(null);
 
+  console.log(data.lyhilemma)
   useEffect(() => {
     axios.post(urlValue + "gettrend", {
         tekst: data.codeandyear.map(item => item.tekstikood),
@@ -145,6 +146,7 @@ const TrendCell = ({data, filterValues}) => {
   const [chartData, setChartData] = useState([])
   const [anchorEl, setAnchorEl] = React.useState(null);
 
+  console.log(data.lyhilemma)
   useEffect(() => {
     data.codeandyear.forEach((show, index) => {
       years[show.year] += 1;
@@ -179,6 +181,8 @@ const TrendCell = ({data, filterValues}) => {
       setChartData(tempArray);
     })*/
   }, [])
+
+  console.log(chartData)
 
   return (
     <div>

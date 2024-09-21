@@ -2,14 +2,16 @@ import React, {useState} from 'react';
 import {TabContext, TabList, TabPanel} from "@mui/lab";
 import {Box, Button, Tab} from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import NameNameTab from "./NameNameTab";
+import NameNameTab from "./KeywordNameTab";
 import {NameGraph} from "../namegraph/NameGraph";
 import MapComp2 from "../mapcomponent/MapComp2";
-import NameInput from "./NameInput";
+import NameInput from "./KeywordInput";
 import RowsPerTable from "../RowsPerTable";
-import NameKeywordsTable from "./NameKeywordsTable";
+import NameKeywordsTable from "./KeywordKeywordsTable";
+import KeywordInput from "./KeywordInput";
+import KeywordKeywordsTable from "./KeywordKeywordsTable";
 
-const NameViews = (
+const KeywordViews = (
   {
     setIsKeywordsLoading,
     isKeywordsLoading,
@@ -36,6 +38,8 @@ const NameViews = (
     setCurrentTabValue(newValue);
   };
 
+  console.log(isKeywordsLoading)
+
   return (
     <div className="App">
       <div>
@@ -48,12 +52,12 @@ const NameViews = (
                   <Tab label="Nimede seosed" value="nameTab" />
                   <Tab label="Märksõnade seosed" value="keywordTab" />
                   <Tab label="Kaardivaade" value="mapTab" />
-                  <Tab label="Graafivaade" value="GraphTab"/>
+                  {/*<Tab label="Graafivaade" value="GraphTab"/>*/}
                 </TabList>
               </Box>
             </div>
             <div style={{display: "flex", justifyContent: "space-between", alignItems: "center", paddingRight: "20px"}}>
-              <NameInput
+              <KeywordInput
                 setIsKeywordsLoading={setIsKeywordsLoading}
                 filterValues={filterValues}
                 setNameKeywordQueryAnswer={setNameKeywordQueryAnswer}
@@ -94,7 +98,7 @@ const NameViews = (
                   </div>
                 </div>
                 :
-                <NameKeywordsTable
+                <KeywordKeywordsTable
                   queryAnswer={nameKeywordQueryAnswer}
                   filterValues={filterValues}
                   tableRows = {tableRows}
@@ -104,7 +108,7 @@ const NameViews = (
            <TabPanel value="mapTab">
               <MapComp2 queryButtonPressed={queryButtonPressed} nameQueryAnswer={nameQueryAnswer} setGraph={setGraph} mapData={mapAnswer} tabVal={"nameTab"} />
             </TabPanel>
-            {currentTabValue === "GraphTab" && <NameGraph graph={graph} setGraph={setGraph} nameArray={nameArray} nameQueryAnswer={nameQueryAnswer}/>}
+            {/*{currentTabValue === "GraphTab" && <NameGraph graph={graph} setGraph={setGraph} nameArray={nameArray} nameQueryAnswer={nameQueryAnswer}/>}*/}
           </TabContext>
         </div>
       </div>
@@ -112,4 +116,4 @@ const NameViews = (
   );
 };
 
-export default NameViews;
+export default KeywordViews;

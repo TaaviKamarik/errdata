@@ -2,9 +2,9 @@ import React, {useState} from 'react';
 import { CircularProgress} from "@mui/material";
 import {tableLoadCircularProgress, tabValues} from "../../constants/constants";
 import {Alert} from "@mui/lab";
-import NameNameTable from "./NameNameTable";
+import NameNameTable from "./KeywordNameTable";
 
-export default function NameNameTab (
+export default function KeywordNameTab (
   {
     tableRows,
     filterValues,

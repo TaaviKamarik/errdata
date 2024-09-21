@@ -13,7 +13,7 @@ import SliderFilter from "../filterinners/SliderFilter";
 import NameTablePagination from "../table/components/NameTablePagination";
 import SortButton from "../SortButton";
 
-const NameNameTable = (
+const KeywordNameTable = (
   {
     filterValues,
     tabVal,
@@ -31,7 +31,7 @@ const NameNameTable = (
   const [localQuery, setLocalQuery] = useState(queryAnswer);
   const controller = new AbortController();
   const tyybid = {loc: "Asukoht", org: "Organisatsioon", per: "Isik"}
-  const [sortValues, setSortValues] = useState({nimetus: "", tyyp: "", kokku: "", sama_lause_nr: "D", koodNr: "", minYear: "", maxYear: ""})
+  const [sortValues, setSortValues] = useState({nimetus: "", tyyp: "", kokku: "D", koodNr: "", minYear: "", maxYear: ""})
   const [filteredData, setFilteredData] = useState(queryAnswer);
   const [filterBooleans, setFilterBooleans] = useState({nameFilter: "", categoryFilter: ["per", "org", "loc"], totalFilter: [], sameSentFilter: [], differentShowFilter: [], yearFilter: []})
 
@@ -45,7 +45,7 @@ const NameNameTable = (
 
     const newDirection = currentDirection === "" || currentDirection === "A" ? "D" : "A";
 
-    const newSortValues = {nimetus: "", tyyp: "", kokku: "", sama_lause_nr: "", koodNr: "", minYear: "", maxYear: ""}
+    const newSortValues = {nimetus: "", tyyp: "", kokku: "", koodNr: "", minYear: "", maxYear: ""}
     newSortValues[ID] = newDirection;
 
     setSortValues(newSortValues);
@@ -134,7 +134,7 @@ const NameNameTable = (
               </span>
             </div>
           </th>
-          {tabVal === "nameTab" && <th
+          {/*{tabVal === "nameTab" && <th
             className={"data-table-header"}
           >
             <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
@@ -154,7 +154,7 @@ const NameNameTable = (
                 />
               </span>
             </div>
-          </th>}
+          </th>}*/}
           <th
             className={"data-table-header"}
           >
@@ -204,9 +204,9 @@ const NameNameTable = (
               <td>{data.nimetus}</td>
               <td>{tyybid[data.tyyp]}</td>
               <td>{data.kokku}</td>
-              <td>
+             {/* <td>
                 <SentencePopover data={data}/>
-              </td>
+              </td>*/}
               <td>
                <Show
                   data={data}
@@ -232,4 +232,4 @@ const NameNameTable = (
   );
 };
 
-export default NameNameTable;
+export default KeywordNameTable;

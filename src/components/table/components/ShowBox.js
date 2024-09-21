@@ -7,7 +7,7 @@ import ShowInnerPopup from "./ShowInnerPopup";
 import {sortShowBoxArray} from "../helperfunctions/helperFunctions";
 import getShowData from "../queries/getShowData";
 
-export default function ShowBox({data, queryButtonPressed, version}) {
+export default function ShowBox({data, version}) {
 
   const [changedShowMetadata, setChangedShowMetadata] = useState();
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -72,6 +72,7 @@ export default function ShowBox({data, queryButtonPressed, version}) {
   }, [showMetaData])*/
 
 
+  console.log(data)
   return(<div className={"sentence-container loaded-container"}>
     {/*{data && <>
       <div style={{display: "flex", justifyContent: "space-between"}}>

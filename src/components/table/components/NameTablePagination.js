@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Pagination, Stack} from "@mui/material";
+import {FormControl, InputLabel, MenuItem, Pagination, Select, Stack} from "@mui/material";
 import axios from "axios";
 import {urlValue} from "../../../constants/constants";
 
@@ -22,7 +22,7 @@ const NameTablePagination = ({handlePageChange, page, queryValue, tableRows, ole
   return (
     <section className="table-pagination">
       <Stack spacing={2}>
-        <Pagination count={Math.floor(queryValue.length / 20)} page={page} onChange={handlePageChange} showFirstButton showLastButton color="primary" />
+        <Pagination count={Math.floor(queryValue.length / tableRows)} page={page} onChange={handlePageChange} showFirstButton showLastButton color="primary" />
       </Stack>
     </section>
   );
